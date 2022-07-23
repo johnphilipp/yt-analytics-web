@@ -1,7 +1,7 @@
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import pandas as pd
-from utils import clean
+import clean
 
 #-----------------------------------------------------------------------
 

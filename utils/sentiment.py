@@ -1,4 +1,4 @@
-from utils import clean
+import clean
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 from textblob import TextBlob
@@ -9,7 +9,7 @@ import os
 
 # Return a df with sentiment score based on transformers
 
-def sentiment_transformers(dir, df):
+def sentiment_transformers(df):
     # Initiate model
     tokenizer = AutoTokenizer.from_pretrained('nlptown/bert-base-multilingual-uncased-sentiment')
     model = AutoModelForSequenceClassification.from_pretrained('nlptown/bert-base-multilingual-uncased-sentiment')
@@ -23,9 +23,6 @@ def sentiment_transformers(dir, df):
     # Claculate sentiment
     df["sentiment"] = df["content_clean"].apply(lambda x: sentiment_score(x[:512]))
 
-    # Write df to csv
-    df.to_csv(dir + "/sentiment_1.csv")  
-
     return df
 
 #-----------------------------------------------------------------------
@@ -33,7 +30,7 @@ def sentiment_transformers(dir, df):
 # Return a df with sentiment score (subjectivity and polarity) based on 
 # textblob
 
-def sentiment_textblob(dir, df):
+def sentiment_textblob(df):
     # Create func to get subjectivity
     def get_subjectivity(text):
         return TextBlob(text).sentiment.subjectivity
@@ -57,8 +54,5 @@ def sentiment_textblob(dir, df):
 
     # Create new col
     df["analysis"] = df["polarity"].apply(get_analysis)
-
-    # Write df to csv
-    df.to_csv(dir + "/sentiment_2.csv")  
 
     return df

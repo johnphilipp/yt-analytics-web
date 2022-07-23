@@ -1,6 +1,3 @@
-data/
-drafts/
-utils/dev_key.txt
 utils/__pycache__/
 .code-workspace
 .DS_Store

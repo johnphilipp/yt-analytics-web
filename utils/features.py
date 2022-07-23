@@ -18,7 +18,7 @@ def get_defined_feature_list():
 # Return df which filters to only include content that contains meantion 
 # of a feature
 
-def get_features(dir, df, feature_list):
+def get_features(df, feature_list):
     # Remove NaNs
     df = df[df["content_clean"].notnull()]
 
@@ -33,14 +33,11 @@ def get_features(dir, df, feature_list):
     df_features = pd.DataFrame()
     for feature in feature_list:
         df_features = pd.concat([df_features, get_single_feature(df, feature)], axis=0)
-    
-    # Write df
-    df.to_csv(dir + "/features.csv")  
 
     return df_features
 
 
-def get_feature_stats(dir, df_features, feature_list):
+def get_feature_stats(df_features, feature_list):
     df_feature_stats = []
     for feature in feature_list:
         df_feature_stats.append([feature,
@@ -51,8 +48,5 @@ def get_feature_stats(dir, df_features, feature_list):
     df_feature_stats = df_feature_stats[df_feature_stats['comment_count'] >= 1]  
     df_feature_stats = df_feature_stats.sort_values(by=["sentiment_mean"], ascending=False)
     df_feature_stats = df_feature_stats.reset_index(drop=True)
-
-    # Write df
-    df_feature_stats.to_csv(dir + "/feature_stats.csv")  
 
     return df_feature_stats

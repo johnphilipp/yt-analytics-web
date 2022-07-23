@@ -42,7 +42,7 @@ if ((run == True)):
         if (not video1.content_exists()):
             st.text("Running analysis for " + video1.get_car_name() + " / " + video1.get_channel_name())
             st.text("1) Downloading content...")
-            video1.get_content()
+            video1.get_content_raw()
             st.text("2) Calculating sentiment...")
             video1.get_sentiment()
             st.text("3) Generating wordcloud...")
@@ -61,7 +61,7 @@ if ((run == True)):
             if (not video2.content_exists()):
                 st.text("Running analysis for " + video2.get_car_name() + " / " + video2.get_channel_name())
                 st.text("1) Downloading content...")
-                video2.get_content()
+                video2.get_content_raw()
                 st.text("2) Calculating sentiment...")
                 video2.get_sentiment()
                 st.text("3) Generating wordcloud...")

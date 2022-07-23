@@ -9,7 +9,7 @@ import pandas as pd
 # Return a df with cleaned content (remove @abc mentions, links, and 
 # punctuation)
 
-def basic_clean(dir, df):
+def basic_clean(df):
     # Creating function to clean comments
     def clean(content):
         content = re.sub(r"@[A-Za-z0-9]+", "", content)
@@ -21,16 +21,13 @@ def basic_clean(dir, df):
     # Cleaning content
     df["content_clean"] = df["content"].apply(clean)
 
-    # Write df to csv
-    df.to_csv(dir + "/content_clean.csv")  
-
     return df
 
 #-----------------------------------------------------------------------
 
 # Return a df where stopwords are removed from content
 
-def remove_stopwords(dir, df):
+def remove_stopwords(df):
     # Download and select stopwords
     nltk.download('stopwords')
     english_stop_words = stopwords.words('english')
@@ -46,8 +43,5 @@ def remove_stopwords(dir, df):
 
     # Remove stopwords and create new col in df
     df["content_no_stopwords"]  = df["content_clean"].apply(stop_word_removal_nltk)
-
-    # Write df to csv
-    df.to_csv(dir + "/content_no_stopwords.csv")  
 
     return df

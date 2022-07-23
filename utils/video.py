@@ -1,11 +1,15 @@
+import sys
 import os
+import json
 from pathlib import Path
 import pandas as pd
-from utils import content
-from utils import clean
-from utils import sentiment
-from utils import wcloud
-from utils import features
+from firebase_admin import credentials, firestore
+import yt
+import fb
+import clean
+import sentiment
+import wcloud
+import features
 
 #-----------------------------------------------------------------------
 
@@ -15,43 +19,41 @@ data_dir = os.path.join(main_dir, "../data")
 #-----------------------------------------------------------------------
 
 class Video: 
-    def __init__(self, car, channel, url, features):
-        self._car = car
-        self._channel = channel
+    def __init__(self, brand, model, url):
+        self._brand = brand
+        self._model = model
         self._url = url
-        self._features = features
-        self._dir = os.path.join(data_dir, car.replace(" ", "_"), channel.replace(" ", "_"))
-        Path(self._dir).mkdir(parents=True, exist_ok=True)
+        self._video_id = self._parse_video_id(url)
+        # Path(self._dir).mkdir(parents=True, exist_ok=True)
 
-    def get_car_name(self):
+    def _parse_video_id(self, url):
         """
-        Return the car name of self.
+        Get video id from video url
         """
-        return self._car
-    
-    def get_channel_name(self):
-        """
-        Return the channel name of self.
-        """
-        return self._channel
+        if "youtu.be" in url: # e.g., https://youtu.be/kbulCM90w8w
+            vid = url.rsplit('/', 1)[-1]
+            if "?" in url: # e.g., https://youtu.be/kbulCM90w8w?t=269
+                vid = vid.split("?", 1)[0]
+        elif "youtube.com" in url: # e.g., https://www.youtube.com/watch?v=kbulCM90w8w
+            vid = url.rsplit('v=', 1)[-1]
+            if "&" in url: # e.g., https://www.youtube.com/watch?v=kbulCM90w8w&t=3s 
+                vid = vid.split("&", 1)[0]
+        else:
+            print("URL invalid")
+            sys.exit()
+        return vid
 
     def get_url(self):
         """
         Return the url of self.
         """
         return self._url
-
-    def get_features(self):
+    
+    def get_video_id(self):
         """
-        Return the car name of self.
+        Return the video_id of self.
         """
-        return self._features
-
-    def get_dir(self):
-        """
-        Return the data dir of self.
-        """
-        return self._dir
+        return self._video_id
     
     def content_exists(self):
         """
@@ -60,96 +62,148 @@ class Video:
         file_path = os.path.join(self._dir, "content.csv")
         path = Path(file_path)
         return path.is_file()
+    
+    def get_meta(self):
+        """
+        Return meta data of self as dict via YouTube API.
+        """
+        return yt.get_meta(self._video_id)
+    
+    def post_meta(self, db, meta):
+        """
+        Post meta data of self to Firebase.
+        """
+        return fb.post_meta(db, self._brand, self._model, self._video_id, meta)
 
-    def get_content(self):
+    def get_content_raw(self):
         """
         Return the content (comments and replies) of self via YouTube API.
         """
-        content.get_content(self._dir, self._url)
+        return yt.get_content_raw(self._video_id)
+    
+    def post_content(self, db, content_json):
+        return fb.post_content(db, self._brand, self._model, self._video_id, content_json)
 
-    def get_sentiment(self):
+    def get_sentiment_transformers(self, df):
         """
-        Return the sentiment of self.
+        Return the sentiment of self via transformers.
         """
-        df = pd.read_csv(self._dir + "/content.csv", header=[0], lineterminator='\n')
-        df = df.drop(['Unnamed: 0'], axis=1, errors='ignore')
-        df_basic_clean = clean.basic_clean(self._dir, df)
-        sentiment.sentiment_transformers(self._dir, df_basic_clean)
-        sentiment.sentiment_textblob(self._dir, df_basic_clean)
+        df_basic_clean = clean.basic_clean(df)
+        return sentiment.sentiment_transformers(df_basic_clean)
+    
+    def get_sentiment_textblob(self, df):
+        """
+        Return the sentiment of self via textblob.
+        """
+        df_basic_clean = clean.basic_clean(df)
+        return sentiment.sentiment_textblob(df_basic_clean)
 
-    def get_wordcloud(self):
-        """
-        Return the wordcloud of self.
-        """
-        df = pd.read_csv(self._dir + "/content_clean.csv", header=[0], lineterminator='\n')
-        df = df.drop(['Unnamed: 0'], axis=1, errors='ignore')
-        df_no_stopwords = clean.remove_stopwords(self._dir, df)
-        wcloud.generate_wordcloud(self._dir, df_no_stopwords)
-
-    def get_feature_stats(self):
+    def get_feature_stats(self, df, feature_list):
         """
         Return the feature stats of self.
         """
-        df = pd.read_csv(self._dir + "/sentiment_1.csv", header=[0], lineterminator='\n')
-        df = df.drop(['Unnamed: 0'], axis=1, errors='ignore')
-        df_features = features.get_features(self._dir, df, self._features)
-        features.get_feature_stats(self._dir, df_features, self._features)
+        df_features = features.get_features(df, feature_list)
+        return features.get_feature_stats(df_features, feature_list)
+
+    # def get_wordcloud(self):
+    #     """
+    #     Return the wordcloud of self.
+    #     """
+    #     df = pd.read_csv(self._dir + "/content_clean.csv", header=[0], lineterminator='\n')
+    #     df = df.drop(['Unnamed: 0'], axis=1, errors='ignore')
+    #     df_no_stopwords = clean.remove_stopwords(self._dir, df)
+    #     wcloud.generate_wordcloud(self._dir, df_no_stopwords)
 
 #-----------------------------------------------------------------------
 
 # Testing
 
 def main():
-    car = "Chevrolet Caprice Donk"
-    channel = "TopGear"
-    url = "https://www.youtube.com/watch?v=OKKyxnR_UM8"
-    features = ["rim", "steering wheel", "engine", "color", "colour",
-                "carbon", "light", "design", "sound", "interior", 
-                "exterior", "mirror", "body", "brake", "chassis", 
-                "suspension", "gearbox", "navigation", "infotainment"]
+    fb.firebase_init()
+    db = firestore.client()
 
-    video = Video(car, channel, url, features)
+    brand = "Porsche"
+    model = "911 Turbo S"
+    url = "https://www.youtube.com/watch?v=E8W6BEc2fZw"
+    video = Video(brand, model, url)
 
     #-----------------------------------------------------------------------
 
     # 0) Retrieve basic information
     print("")
     print("0) Retrieve basic information")
-    car = video.get_car_name()
-    dir = video.get_dir()
-    print(car)
-    print(video.get_channel_name())
     print(video.get_url())
-    print(video.get_features)
-    print(dir)
+    print(video.get_video_id())
 
     #-----------------------------------------------------------------------
 
-    # 1) Get content
+    # 1) Meta
+    # 1.1) Get meta
     print("")
-    print("1) Get content for " + video.get_car_name())
-    video.get_content()
+    print("1) Meta (" + video.get_video_id() + ")")
+    print("1.1) Get meta")
+    meta = video.get_meta()
+    print(meta)
+    # 1.1) Post meta
+    print("1.2) Post meta")
+    print(video.post_meta(db, meta))
 
     #-----------------------------------------------------------------------
 
-    # 2) Calculate sentiment
+    # 2) Content
+    # 2.1) Get content
     print("")
-    print("2) Calculate sentiment")
-    video.get_sentiment()
+    print("2) Content (" + video.get_video_id() + ")")
+    print("2.1) Get content")
+    key = "content_raw"
+    content_raw_df = video.get_content_raw()
+    content_raw_json = {key: content_raw_df.to_dict()}
+    print(content_raw_json[key]["id"][0])
+    print(content_raw_json[key]["content"][0])
+    # 2.2) Post content
+    print("2.2) Post content")
+    print(video.post_content(db, content_raw_json))
 
     #-----------------------------------------------------------------------
 
-    # 3) Generate wordcloud
+    # 2) Sentiment
+    # 2.1) Get sentiment
     print("")
-    print("3) Generate wordcloud")
-    video.get_wordcloud()
+    print("2) Sentiment")
+    print("2.1) Get sentiment")
+    key = "sentiment_1"
+    sentiment_1_df = video.get_sentiment_transformers(content_raw_df)
+    sentiment_1_json = {key: sentiment_1_df.to_dict()}
+    print(sentiment_1_json[key]["id"][0])
+    print(sentiment_1_json[key]["content"][0])
+    print(sentiment_1_json[key]["content_clean"][0])
+    print(sentiment_1_json[key]["sentiment"][0])
+    # 2.2) Post sentiment
+    print("2.2) Post sentiment")
+    print(video.post_content(db, sentiment_1_json))
 
-    #-----------------------------------------------------------------------
+    # #-----------------------------------------------------------------------
 
-    # 4) Get feature stats
+    # 3) Feature stats
+    # 3.1) Get feature stats
     print("")
-    print("4) Get feature stats")
-    video.get_feature_stats()
+    print("3) Get feature stats")
+    feature_list = features.get_defined_feature_list()
+    key = "feature_stats"
+    feature_stats_df = video.get_feature_stats(sentiment_1_df, feature_list)
+    feature_stats_json = {key: feature_stats_df.to_dict()}
+    print(feature_stats_json[key])
+    # 3.2) Post feature stats
+    print("3.2) Post feature stats")
+    print(video.post_content(db, feature_stats_json))
+
+    # #-----------------------------------------------------------------------
+
+    # # 3) Generate wordcloud
+    # print("")
+    # print("3) Generate wordcloud")
+    # video.get_wordcloud()
+
 
 if __name__ == '__main__':
     main()

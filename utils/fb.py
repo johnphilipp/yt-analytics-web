@@ -3,6 +3,7 @@
 import toml
 import firebase_admin
 from firebase_admin import credentials, firestore
+import json
 
 def firebase_init():
 	cred = firebase_admin.credentials.Certificate(toml.load(".streamlit/secrets.toml")["firebase_key"])
@@ -31,17 +32,32 @@ def get_video_ids(db, brand, model):
 def get_video_stats(db, brand, model, video_id):
 	return db.collection("cars").document(brand).collection(model).document(video_id).get().to_dict()
 
-def get_thumbnail_url(db, video_id):
-	return video_id
-
-def post_content(db, brand, model, video_id):
+def post_meta(db, brand, model, video_id, meta):
+	keys = list(meta.keys())
 	db.collection("cars").document(brand).collection(model).document(video_id).set({
-		'alanisawesome': {
-        'date_of_birth': 'June 23, 1912',
-        'full_name': 'Alan Turing'
-    }
-	})
+		"meta": {
+        keys[0]: meta["title"],
+        keys[1]: meta["channel_title"],
+        keys[2]: meta["thumbnail_url"],
+        keys[3]: meta["published_at"],
+        keys[4]: meta["view_count"],
+        keys[5]: meta["like_count"],
+        keys[6]: meta["comment_count"]
+    }})
+	return "Posted meta"
+
+def post_content(db, brand, model, video_id, content_json):
+	key = list(content_json.keys())[0]
+	db.collection("cars").document(brand).collection(model).document(video_id).update({
+		key: {
+        key: json.dumps(content_json[key])
+    }})
 	return "Posted content"
+
+
+
+
+
 
 def main():
 	firebase_init()
