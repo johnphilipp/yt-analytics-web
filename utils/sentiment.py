@@ -1,9 +1,7 @@
-import clean
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 from textblob import TextBlob
 import pandas as pd
-import os
 
 # -----------------------------------------------------------------------
 

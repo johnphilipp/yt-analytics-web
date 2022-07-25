@@ -1,9 +1,6 @@
 import sys
 import os
-import json
 from pathlib import Path
-import pandas as pd
-from firebase_admin import credentials, firestore
 import yt
 import sb
 import clean
