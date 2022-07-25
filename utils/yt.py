@@ -6,22 +6,26 @@ import json
 import os
 import toml
 
-#-----------------------------------------------------------------------
+# -----------------------------------------------------------------------
 
 # Return api keys
+
 
 def _get_youtube_api_key():
     return toml.load(".streamlit/secrets.toml")["youtube_key"]["youtube_key"]
 
+
 def _get_firebase_api_key():
     return toml.load(".streamlit/secrets.toml")["firebase_key"]
+
 
 def _get_firebase_storage_path():
     return toml.load(".streamlit/secrets.toml")["firebase_storage_key"]["firebase_storage_key"]
 
-#-----------------------------------------------------------------------
+# -----------------------------------------------------------------------
 
 # Return meta data dict
+
 
 def get_meta(vid):
     # -*- coding: utf-8 -*-
@@ -40,14 +44,14 @@ def get_meta(vid):
     DEVELOPER_KEY = _get_youtube_api_key()
 
     youtube = googleapiclient.discovery.build(
-        api_service_name, api_version, developerKey = DEVELOPER_KEY)
+        api_service_name, api_version, developerKey=DEVELOPER_KEY)
 
     request = youtube.videos().list(
         id=vid,
         part="snippet,statistics"
     )
     data_all = request.execute()
-    
+
     data = {
         "title": data_all["items"][0]["snippet"]["title"],
         "channel_title": data_all["items"][0]["snippet"]["channelTitle"],
@@ -61,7 +65,7 @@ def get_meta(vid):
     return data
 
 
-#-----------------------------------------------------------------------
+# -----------------------------------------------------------------------
 
 # Return a list with comments data
 
@@ -83,14 +87,14 @@ def _get_comments(vid):
     DEVELOPER_KEY = _get_youtube_api_key()
 
     youtube = googleapiclient.discovery.build(
-        api_service_name, api_version, developerKey = DEVELOPER_KEY)
+        api_service_name, api_version, developerKey=DEVELOPER_KEY)
 
     # Query to retrieve top level comments
     def make_comments_request(vid, pToken):
         request = youtube.commentThreads().list(
             part="snippet, replies",
             videoId=vid,
-            maxResults=100, # max 100
+            maxResults=100,  # max 100
             textFormat="plainText",
             order="relevance",
             pageToken=pToken
@@ -99,7 +103,7 @@ def _get_comments(vid):
 
     # Retrieve first page
     comments = []
-    pageToken = None # At first API call, pageToken is None
+    pageToken = None  # At first API call, pageToken is None
     page = make_comments_request(vid, pageToken)
     comments.append(page)
     pageToken = page.get("nextPageToken")
@@ -109,14 +113,15 @@ def _get_comments(vid):
         page = make_comments_request(vid, pageToken)
         comments.append(page)
         pageToken = page.get("nextPageToken")
-    
+
     # print(comments)
 
     return comments
 
-#-----------------------------------------------------------------------
+# -----------------------------------------------------------------------
 
 # Return a list with reply data for a list of comments
+
 
 def _get_replies(comments):
     print("Getting replies")
@@ -130,13 +135,13 @@ def _get_replies(comments):
     DEVELOPER_KEY = _get_youtube_api_key()
 
     youtube = googleapiclient.discovery.build(
-        api_service_name, api_version, developerKey = DEVELOPER_KEY)
-    
+        api_service_name, api_version, developerKey=DEVELOPER_KEY)
+
     # Get ids of top level comments which have replies
     ids = []
     for page in comments:
         for i in range(int(len(page["items"]))):
-            if page["items"][i].get("replies") != None: 
+            if page["items"][i].get("replies") != None:
                 ids.append(page["items"][i]["id"])
 
     # Query to retrieve replies on top level comments
@@ -144,7 +149,7 @@ def _get_replies(comments):
         request = youtube.comments().list(
             part="snippet",
             parentId=id,
-            maxResults=100, # max 100
+            maxResults=100,  # max 100
             pageToken=pToken,
             textFormat="plainText"
         )
@@ -153,7 +158,7 @@ def _get_replies(comments):
     replies = []
     for i in range(len(ids)):
         # Retrieve first page
-        pageToken = None # At first API call, pageToken is None
+        pageToken = None  # At first API call, pageToken is None
         page = make_replies_request(ids[i], pageToken)
         replies.append(page)
         pageToken = page.get("nextPageToken")
@@ -163,14 +168,15 @@ def _get_replies(comments):
             page = make_replies_request(ids[i], pageToken)
             replies.append(page)
             pageToken = page.get("nextPageToken")
-    
+
     # print(replies)
 
-    return replies   
+    return replies
 
-#-----------------------------------------------------------------------
+# -----------------------------------------------------------------------
 
 # Return a df with filtered and stitched comment and reply data for a video id
+
 
 def get_content_raw(vid):
     print("Getting content")
@@ -187,7 +193,7 @@ def get_content_raw(vid):
             data.append([comment_id, comment])
 
             # Fetch replies (append comment id and reply content)
-            if page_c["items"][i].get("replies") != None: 
+            if page_c["items"][i].get("replies") != None:
                 for page_r in replies:
                     for j in range(int(len(page_r["items"]))):
                         reply_parent_id = page_r["items"][j]["snippet"]["parentId"]
@@ -201,12 +207,14 @@ def get_content_raw(vid):
 
     return df
 
-#-----------------------------------------------------------------------
+# -----------------------------------------------------------------------
 
 # Testing
 
+
 def main():
     return
+
 
 if __name__ == '__main__':
     main()

@@ -5,30 +5,35 @@ from textblob import TextBlob
 import pandas as pd
 import os
 
-#-----------------------------------------------------------------------
+# -----------------------------------------------------------------------
 
 # Return a df with sentiment score based on transformers
 
+
 def sentiment_transformers(df):
     # Initiate model
-    tokenizer = AutoTokenizer.from_pretrained('nlptown/bert-base-multilingual-uncased-sentiment')
-    model = AutoModelForSequenceClassification.from_pretrained('nlptown/bert-base-multilingual-uncased-sentiment')
+    tokenizer = AutoTokenizer.from_pretrained(
+        'nlptown/bert-base-multilingual-uncased-sentiment')
+    model = AutoModelForSequenceClassification.from_pretrained(
+        'nlptown/bert-base-multilingual-uncased-sentiment')
 
     def sentiment_score(review):
         tokens = tokenizer.encode(review, return_tensors='pt')
         result = model(tokens)
         # result.logits # prints tensor
         return int(torch.argmax(result.logits))+1
-    
+
     # Claculate sentiment
-    df["sentiment"] = df["content_clean"].apply(lambda x: sentiment_score(x[:512]))
+    df["sentiment_score"] = df["content_clean"].apply(
+        lambda x: sentiment_score(x[:512]))
 
     return df
 
-#-----------------------------------------------------------------------
+# -----------------------------------------------------------------------
 
-# Return a df with sentiment score (subjectivity and polarity) based on 
+# Return a df with sentiment score (subjectivity and polarity) based on
 # textblob
+
 
 def sentiment_textblob(df):
     # Create func to get subjectivity

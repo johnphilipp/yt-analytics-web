@@ -2,14 +2,53 @@
 
 import toml
 import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase_admin import credentials, firestore, initialize_app, storage
 import json
+import pandas as pd
 
 def firebase_init():
 	cred = firebase_admin.credentials.Certificate(toml.load(".streamlit/secrets.toml")["firebase_key"])
 	default_app = firebase_admin.initialize_app(cred, {
-		"databaseURL": "https://analytics-44b35.firebaseio.com"
+		"databaseURL": "https://analytics-44b35.firebaseio.com",
+		'storageBucket': 'analytics-44b35.appspot.com'
 		})
+
+
+
+
+
+
+
+def upload_df(df, video_id, file_name):
+	"""
+	Upload a Dataframe as a csv to Firebase Storage
+	:return: storage_ref
+	"""
+	bucket = storage.bucket()
+	storage_ref = video_id + "/" + file_name + ".json"
+	blob = bucket.blob(storage_ref)
+	blob.upload_from_string(df.to_json())
+
+	# # Opt : if you want to make public access from the URL
+	# blob.make_public()
+
+	return storage_ref
+
+
+def download_df(video_id, file_name):
+	"""
+	Download a csv to Firebase Storage and convert to pandas df
+	:return: storage_ref
+	"""
+	bucket = storage.bucket()
+	storage_ref = video_id + "/" + file_name + ".json"
+	blob = bucket.blob(storage_ref)
+	data = blob.download_as_string().decode("utf-8")
+	dict = json.loads(data)
+	return pd.DataFrame.from_dict(dict)
+
+
+
 
 def get_brands(db):
 	brands = []
