@@ -122,84 +122,115 @@ def main():
     fb.firebase_init()
     db = firestore.client()
 
-    brand = "Porsche"
-    model = "911 Turbo S"
-    url = "https://www.youtube.com/watch?v=E8W6BEc2fZw"
-    video = Video(brand, model, url)
+    # brand = "Tesla"
+    # model = "Model Y"
+    # # year?
+    # url = "https://www.youtube.com/watch?v=wGymLNmfhvo"
+    # video = Video(brand, model, url)
+
+    brands = ["Tesla", 
+    "Polestar", 
+    "Tesla",
+    "Ford",
+    "Tesla",
+    "Hyundai",
+    "Hyundai",
+    "Porsche"]
+    models = ["Model S P100D", 
+    "2", 
+    "Cybertruck",
+    "Mustang Mach-E",
+    "Model Y",
+    "Ioniq 5",
+    "Ioniq 5",
+    "Taycan Turbo"]
+    urls = ["https://www.youtube.com/watch?v=mHhZ9jk-DrU", 
+    "https://www.youtube.com/watch?v=gY9VVmbM2J8", 
+    "https://www.youtube.com/watch?v=eggEfgyO81Q",
+    "https://www.youtube.com/watch?v=CpuTKOq9QQk",
+    "https://www.youtube.com/watch?v=cH79SuivdAQ",
+    "https://www.youtube.com/watch?v=4srUTEFV_XQ",
+    "https://www.youtube.com/watch?v=88IwkKQFPcE",
+    "https://www.youtube.com/watch?v=c2dkDhhtm8I"]
+
+    for i in range(0, len(brands)):
+        video = Video(brands[i], models[i], urls[i])
+
+
+        #-----------------------------------------------------------------------
+
+        # 0) Retrieve basic information
+        print("")
+        print("0) Retrieve basic information")
+        print(video.get_url())
+        print(video.get_video_id())
+
+        #-----------------------------------------------------------------------
+
+        # 1) Meta
+        # 1.1) Get meta
+        print("")
+        print("1) Meta (" + video.get_video_id() + ")")
+        print("1.1) Get meta")
+        meta = video.get_meta()
+        print(meta)
+        # 1.1) Post meta
+        print("1.2) Post meta")
+        print(video.post_meta(db, meta))
+
+        #-----------------------------------------------------------------------
+
+        # 2) Content
+        # 2.1) Get content
+        print("")
+        print("2) Content (" + video.get_video_id() + ")")
+        print("2.1) Get content")
+        key = "content_raw"
+        content_raw_df = video.get_content_raw()
+        content_raw_json = {key: content_raw_df.to_dict()}
+        print(content_raw_json[key]["id"][0])
+        print(content_raw_json[key]["content"][0])
+        # 2.2) Post content
+        print("2.2) Post content")
+        print(video.post_content(db, content_raw_json))
+
+        #-----------------------------------------------------------------------
+
+        # 3) Sentiment
+        # 3.1) Get sentiment
+        print("")
+        print("3) Sentiment (" + video.get_video_id() + ")")
+        print("3.1) Get sentiment")
+        key = "sentiment_1"
+        sentiment_1_df = video.get_sentiment_transformers(content_raw_df)
+        sentiment_1_json = {key: sentiment_1_df.to_dict()}
+        print(sentiment_1_json[key]["id"][0])
+        print(sentiment_1_json[key]["content"][0])
+        print(sentiment_1_json[key]["content_clean"][0])
+        print(sentiment_1_json[key]["sentiment"][0])
+        # 3.2) Post sentiment
+        print("3.2) Post sentiment")
+        print(video.post_content(db, sentiment_1_json))
 
     #-----------------------------------------------------------------------
 
-    # 0) Retrieve basic information
-    print("")
-    print("0) Retrieve basic information")
-    print(video.get_url())
-    print(video.get_video_id())
-
-    #-----------------------------------------------------------------------
-
-    # 1) Meta
-    # 1.1) Get meta
-    print("")
-    print("1) Meta (" + video.get_video_id() + ")")
-    print("1.1) Get meta")
-    meta = video.get_meta()
-    print(meta)
-    # 1.1) Post meta
-    print("1.2) Post meta")
-    print(video.post_meta(db, meta))
-
-    #-----------------------------------------------------------------------
-
-    # 2) Content
-    # 2.1) Get content
-    print("")
-    print("2) Content (" + video.get_video_id() + ")")
-    print("2.1) Get content")
-    key = "content_raw"
-    content_raw_df = video.get_content_raw()
-    content_raw_json = {key: content_raw_df.to_dict()}
-    print(content_raw_json[key]["id"][0])
-    print(content_raw_json[key]["content"][0])
-    # 2.2) Post content
-    print("2.2) Post content")
-    print(video.post_content(db, content_raw_json))
-
-    #-----------------------------------------------------------------------
-
-    # 2) Sentiment
-    # 2.1) Get sentiment
-    print("")
-    print("2) Sentiment")
-    print("2.1) Get sentiment")
-    key = "sentiment_1"
-    sentiment_1_df = video.get_sentiment_transformers(content_raw_df)
-    sentiment_1_json = {key: sentiment_1_df.to_dict()}
-    print(sentiment_1_json[key]["id"][0])
-    print(sentiment_1_json[key]["content"][0])
-    print(sentiment_1_json[key]["content_clean"][0])
-    print(sentiment_1_json[key]["sentiment"][0])
-    # 2.2) Post sentiment
-    print("2.2) Post sentiment")
-    print(video.post_content(db, sentiment_1_json))
+    # # 4) Feature stats
+    # # 4.1) Get feature stats
+    # print("")
+    # print("4) Feature stats (" + video.get_video_id() + ")")
+    # print("4.1) Get feature stats")
+    # feature_list = features.get_defined_feature_list()
+    # key = "feature_stats"
+    # feature_stats_df = video.get_feature_stats(sentiment_1_df, feature_list)
+    # feature_stats_json = {key: feature_stats_df.to_dict()}
+    # print(feature_stats_json[key])
+    # # 4.2) Post feature stats
+    # print("4.2) Post feature stats")
+    # print(video.post_content(db, feature_stats_json))
 
     # #-----------------------------------------------------------------------
 
-    # 3) Feature stats
-    # 3.1) Get feature stats
-    print("")
-    print("3) Get feature stats")
-    feature_list = features.get_defined_feature_list()
-    key = "feature_stats"
-    feature_stats_df = video.get_feature_stats(sentiment_1_df, feature_list)
-    feature_stats_json = {key: feature_stats_df.to_dict()}
-    print(feature_stats_json[key])
-    # 3.2) Post feature stats
-    print("3.2) Post feature stats")
-    print(video.post_content(db, feature_stats_json))
-
-    # #-----------------------------------------------------------------------
-
-    # # 3) Generate wordcloud
+    # # 5) Generate wordcloud
     # print("")
     # print("3) Generate wordcloud")
     # video.get_wordcloud()

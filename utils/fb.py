@@ -29,8 +29,18 @@ def get_video_ids(db, brand, model):
 		video_ids.append(k.id)
 	return video_ids
 
-def get_video_stats(db, brand, model, video_id):
-	return db.collection("cars").document(brand).collection(model).document(video_id).get().to_dict()
+#
+#
+#
+# v v v TODO: This needs to be changed v v v
+#
+#
+#
+def get_data(db, brand, model, video_id, field="all"):
+	if field == "all":
+		return db.collection("cars").document(brand).collection(model).document(video_id).get().to_dict()
+	else:
+		return db.collection("cars").document(brand).collection(model).document(video_id).get().to_dict()[field]
 
 def post_meta(db, brand, model, video_id, meta):
 	keys = list(meta.keys())
@@ -72,20 +82,20 @@ def main():
 	print(models) # ['911 GT3', '911 Sport Classic']
 	print("")
 
-	model = models[0]
+	model = models[2]
 	video_ids = get_video_ids(db, brand, model)
 	print(video_ids) # ['abc123', 'pop789']
 	print("")
 
 	video_id = video_ids[0]
-	thumbnail_url = get_thumbnail_url(db, video_id)
-	print(thumbnail_url) # 
-	print("")
+	# video_data = get_data(db, brand, model, video_id)
+	# print(video_data, "\n")
+	print(get_data(db, brand, model, video_id, field="meta"), "\n")
+	print(get_data(db, brand, model, video_id, field="content_raw")["content_raw"], "\n")
+	print(get_data(db, brand, model, video_id, field="sentiment_1")["sentiment_1"], "\n")
+	print(get_data(db, brand, model, video_id, field="feature_stats")["feature_stats"], "\n")
 
-	video_stats = get_video_stats(db, brand, model, video_id)
-	print(video_stats)
-
-	print(post_content(db, "Porsche", "911 GT3", "xxx"))
+	# print(post_content(db, "Porsche", "911 GT3", "xxx"))
 
 if __name__ == '__main__':
     main()

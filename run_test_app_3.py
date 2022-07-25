@@ -53,11 +53,11 @@ if 'video_ids_selected' not in st.session_state:
 if brand != "" and model != "":
     st.session_state['video_ids_fetched'] = fb.get_video_ids(db, brand, model)
 
-# Display content of each element (video_id) in 'video_ids_fetched' session state
+# Display meta content of each element (video_id) in 'video_ids_fetched' session state
 if len(st.session_state['video_ids_fetched']) > 0:
     for video_id in st.session_state['video_ids_fetched']:
-        video_data = fb.get_data(db, brand, model, video_id)
-        app2.display_video_data(video_id, video_data)
+        video_meta_data = fb.get_data(db, brand, model, video_id, field="meta")
+        app2.display_video_data(video_id, video_meta_data)
         app2.space_sidebar(1)    
 
 #-----------------------------------------------------------------------

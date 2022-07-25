@@ -64,7 +64,7 @@ if brand != "" and model != "":
 # Display content of each element (video_id) in 'video_ids_fetched' session state
 if len(st.session_state['video_ids_fetched']) > 0:
     for video_id in st.session_state['video_ids_fetched']:
-        video_data = fb.get_video_stats(db, brand, model, video_id)
+        video_data = fb.get_data(db, brand, model, video_id)
         app.display_video_data(video_id, video_data, "_select")
         app.space(1)    
 
@@ -78,7 +78,7 @@ st.markdown("<a style='text-align: left; color: gray; position: relative; bottom
 # st.text(st.session_state['video_ids_selected'])
 if len(st.session_state['video_ids_selected']) > 0:
     for video_id in st.session_state['video_ids_selected']:
-        video_data = fb.get_video_stats(db, brand, model, video_id)
+        video_data = fb.get_data(db, brand, model, video_id)
         app.display_video_data(video_id, video_data, "_modify")
         app.space(1)    
     
