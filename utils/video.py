@@ -5,8 +5,7 @@ from pathlib import Path
 import pandas as pd
 from firebase_admin import credentials, firestore
 import yt
-import fb
-import sbase
+import sb
 import clean
 import sentiment
 import wcloud
@@ -119,16 +118,16 @@ class Video:
     #     wcloud.generate_wordcloud(self._dir, df_no_stopwords)
 
     def get_car_id(self):
-        return sbase.get_car_id(self._make, self._model, self._trim, self._year)
+        return sb.get_car_id(self._make, self._model, self._trim, self._year)
 
     def post_meta_supabase(self, car_id, meta):
-        return sbase.insert_meta(self._video_id, car_id, meta)
+        return sb.insert_meta(self._video_id, car_id, meta)
 
     def post_content_supabase(self, content):
-        return sbase.insert_content(self._video_id, content)
+        return sb.insert_content(self._video_id, content)
 
     def post_sentiment_supabase(self, sentiment):
-        return sbase.insert_sentiment(self._video_id, sentiment)
+        return sb.insert_sentiment(self._video_id, sentiment)
 
 # -----------------------------------------------------------------------
 
@@ -136,72 +135,35 @@ class Video:
 
 
 def main():
-    fb.firebase_init()
-    db = firestore.client()
+    input = [
+        ["Make", "Model", "Trim", "Year", "Url"],
+        ["Tesla", "Model S", "P100D", "2020",
+            "https://www.youtube.com/watch?v=mHhZ9jk-DrU"],
+        ["Polestar", "2", "Standard", "2021",
+            "https://www.youtube.com/watch?v=gY9VVmbM2J8"],
+        ["VW", "ID.4", "Standard", "2021",
+            "https://www.youtube.com/watch?v=5rVSw9r7LQc"],
+        ["Tesla", "Model 3", "Standard", "2019",
+            "https://www.youtube.com/watch?v=kbulCM90w8w"],
+        ["Tesla", "Model Y", "Standard", "2022",
+            "https://www.youtube.com/watch?v=PZ8NPeYFPCY"]
+    ]
 
-    # brand = "Tesla"
-    # model = "Model Y"
-    # # year?
-    # url = "https://www.youtube.com/watch?v=wGymLNmfhvo"
-    # video = Video(brand, model, url)
-
-    makes = ["Tesla",
-             "Polestar",
-             "Tesla",
-             "Ford",
-             "Tesla",
-             "Hyundai",
-             "Hyundai",
-             "Porsche"]
-    models = ["Model S",
-              "2",
-              "Cybertruck",
-              "Mustang Mach-E",
-              "Model Y",
-              "Ioniq 5",
-              "Ioniq 5",
-              "Taycan Turbo"]
-    trims = ["P100D",
-             "",
-             "",
-             "",
-             "",
-             "",
-             "",
-             ""]
-    years = ["2020",
-             "2021",
-             "2023",
-             "2022",
-             "2022",
-             "2022",
-             "2022",
-             "2020"]
-    urls = ["https://www.youtube.com/watch?v=mHhZ9jk-DrU",
-            "https://www.youtube.com/watch?v=gY9VVmbM2J8",
-            "https://www.youtube.com/watch?v=eggEfgyO81Q",
-            "https://www.youtube.com/watch?v=CpuTKOq9QQk",
-            "https://www.youtube.com/watch?v=cH79SuivdAQ",
-            "https://www.youtube.com/watch?v=4srUTEFV_XQ",
-            "https://www.youtube.com/watch?v=88IwkKQFPcE",
-            "https://www.youtube.com/watch?v=c2dkDhhtm8I"]
-
-    # for i in range(0, len(makes)):
-    for i in range(1, 2):
-        video = Video(makes[i], models[i], trims[i], years[i], urls[i])
-
-        print(video.get_car_id())
+    for i in range(1, len(input)):
+        # for i in range(2, 3):
+        video = Video(input[i][0], input[i][1], input[i]
+                      [2], input[i][3], input[i][4])
 
         # -----------------------------------------------------------------------
 
-        # # 1) Meta
-        # # 1.1) Get meta
-        # print("\n1) Meta (" + video.get_video_id() + ")")
-        # print("1.1) Get meta")
-        # meta = video.get_meta()
-        # # 1.2) Post meta
-        # print("1.2) Post meta")
-        # video.post_meta_supabase(video.get_car_id(), meta)
+        # 1) Meta
+        # 1.1) Get meta
+        print("\n1) Meta (" + video.get_video_id() + ")")
+        print("1.1) Get meta")
+        meta = video.get_meta()
+        # 1.2) Post meta
+        print("1.2) Post meta")
+        video.post_meta_supabase(video.get_car_id(), meta)
 
         # -----------------------------------------------------------------------
 
@@ -210,7 +172,6 @@ def main():
         print("\n2) Content (" + video.get_video_id() + ")")
         print("2.1) Get content")
         content = video.get_content_raw()
-        # content_json = content.to_dict()
         # 2.2) Post content
         # print("2.2) Post content")
         # print(video.post_content_supabase(content))

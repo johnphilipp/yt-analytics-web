@@ -1,110 +1,97 @@
-from utils.video import Video 
-from utils import features
+from utils import sb
 from utils import app
 import streamlit as st
 import pandas as pd
 
-#-----------------------------------------------------------------------
 
-st.set_page_config(layout="centered", page_icon="🚗", page_title="YouTube Comment Analyzer")
+# -----------------------------------------------------------------------
 
-st.markdown("<h1 style='text-align: center; color: white;'>WDYT?</h1>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center; color: white; position: relative; bottom: 20px;'>🚗 🤔 💬 📊</h3>", unsafe_allow_html=True)
-app.space(1)
+# Set page header (just text)
 
-st.subheader("Get Started")
-st.caption("### Choose one or two YouTube videos and title the car(s) and channel(s).")
-app.space(2)
+st.set_page_config(layout="centered", page_icon="🚗",
+                   page_title="YouTube Comment Analyzer")
 
-col1, col2 = st.columns([1,1])
-with col1:
-    car1 = st.text_input('Car')
-    channel1 = st.text_input('Channel')
-    url1 = st.text_input('YouTube URL')
-with col2:
-    car2 = st.text_input('Car ')
-    channel2 = st.text_input('Channel ')
-    url2 = st.text_input('YouTube URL ')
-app.space(1)
+# -----------------------------------------------------------------------
 
-feature_list = st.multiselect("Features", features.get_defined_feature_list(), features.get_defined_feature_list()) # Add text_input for additional features
-app.space(1)
+# Get started section
 
-run = st.button('Run')
-app.space(1)
+# Create dropdown with values from firebase
+make = st.sidebar.selectbox(  # can this be empty on first run?
+    'Select Make',
+    sb.get_makes())
+model = st.sidebar.selectbox(
+    'Select Model',
+    sb.get_models(make))
+trim = st.sidebar.selectbox(
+    'Select Model',
+    sb.get_trim(make, model))
+year = st.sidebar.selectbox(
+    'Select Model',
+    sb.get_year(make, model, trim))
+app.space_sidebar()
 
-videos_to_merge = []
+# Initialize 'video_ids_fetched' session state
+if 'video_ids_fetched' not in st.session_state:
+    st.session_state['video_ids_fetched'] = []
 
-if ((run == True)):
-    # Run analysis for video1
-    if ((car1 != "") and (channel1 != "") and (url1 != "")):
-        video1 = Video(car1, channel1, url1, feature_list)
-        if (not video1.content_exists()):
-            st.text("Running analysis for " + video1.get_car_name() + " / " + video1.get_channel_name())
-            st.text("1) Downloading content...")
-            video1.get_content_raw()
-            st.text("2) Calculating sentiment...")
-            video1.get_sentiment()
-            st.text("3) Generating wordcloud...")
-            video1.get_wordcloud()
-            st.text("4) Calculating feature stats...")
-            video1.get_feature_stats()
-            st.text("Finished.")
-        else:
-            # TODO: Check if new comments and as if user wants to overwrite / run analysis
-            st.text("Analysis for " + video1.get_car_name() + " / " + video1.get_channel_name() + " already exists.")
-        videos_to_merge.append(video1)
+# Initialize 'video_ids' session state
+if 'video_ids_selected' not in st.session_state:
+    st.session_state['video_ids_selected'] = []
 
-        # Run analysis for video2
-        if ((car2 != "") and (channel2 != "") and (url2 != "")):
-            video2 = Video(car2, channel2, url2, feature_list)      
-            if (not video2.content_exists()):
-                st.text("Running analysis for " + video2.get_car_name() + " / " + video2.get_channel_name())
-                st.text("1) Downloading content...")
-                video2.get_content_raw()
-                st.text("2) Calculating sentiment...")
-                video2.get_sentiment()
-                st.text("3) Generating wordcloud...")
-                video2.get_wordcloud()
-                st.text("4) Calculating feature stats...")
-                video2.get_feature_stats()
-                st.text("Finished.")
-            else:
-                # TODO: Check if new comments and as if user wants to overwrite / run analysis
-                st.text("Analysis for " + video2.get_car_name() + " / " + video2.get_channel_name() + " already exists.")
-            videos_to_merge.append(video2)
+# Write new 'video_ids_fetched' session state
+if make != "" and model != "":
+    car_id = sb.get_car_id(make, model, trim, year)
+    st.session_state['video_ids_fetched'] = sb.get_video_ids_for_car(car_id)
 
-        # Merge video1 and video2 if applicable and display
-        merged_videos_path = app.merge_df(videos_to_merge) # TODO: Could also return df straight but getting weird errors because instance of Video class is EMPTY after changing elements below
-        st.experimental_set_query_params(my_saved_result=merged_videos_path)  # Save value
+# Display meta content of each element (video_id) in 'video_ids_fetched' session state
+if len(st.session_state['video_ids_fetched']) > 0:
+    for video_id in st.session_state['video_ids_fetched']:
+        meta = sb.get_meta(video_id)
+        app.display_meta(video_id, meta)
+        app.space_sidebar(1)
 
-# Retrieve app state
-app_state = st.experimental_get_query_params()  
-if "my_saved_result" in app_state:
-    if "my_saved_result" in app_state:
-        saved_result = app_state["my_saved_result"][0]
-    else:
-        st.write("No result to display, compute a value first.")
+# -----------------------------------------------------------------------
 
-    # Read df 
-    merged_videos = pd.read_csv(saved_result, header=[0], lineterminator='\n')
-
-    st.markdown("""---""")
-    app.space(1)
-    st.subheader("Sentiment Radar Chart")
-    st.caption("### View the sentiment of all mentioned features in a radar chart.")
-    app.space(2)
+if len(st.session_state['video_ids_fetched']) > 0:
+    columns = ["feature", "comment_count", "sentiment_mean", "car"]
+    feature_stats = pd.DataFrame(columns=columns)
+    for vid in st.session_state['video_ids_selected']:
+        current = sb.get_feature_stats(vid)
+        current['car'] = sb.get_car_from_video_id(vid)
+        # print(current.head())
+        feature_stats = pd.concat([feature_stats, current])
+        feature_stats = feature_stats[feature_stats.groupby('feature')["feature"].transform(len)
+                                      > (len(st.session_state['video_ids_fetched']) - 1)]
+        feature_stats = feature_stats.sort_values(by=['feature'])
+        feature_stats.insert(0, 'car', feature_stats.pop('car'))
+        print("")
+        print("")
+        print("")
+        print(feature_stats)
+        print("")
+        print("")
+        print("")
+        # print(st.session_state['video_ids_selected'])
+        # print(feature_stats.head())
+        print("")
 
     # Display videos that are in merged set
-    all_videos = merged_videos["car"].unique().tolist()
+    all_videos = feature_stats["car"].unique().tolist()
     videos = st.multiselect("Select cars to visualize", all_videos, all_videos)
-    app.space(1)
 
     # Display features that are in merged set
-    all_features = merged_videos["feature"].unique().tolist()
-    feature_list_visualize = st.multiselect("Select features to visualize", all_features, all_features)
+    all_features = feature_stats["feature"].unique().tolist()
+    feature_list_visualize = st.multiselect(
+        "Select features to visualize", all_features, all_features)
     app.space(1)
 
-    merged_videos = merged_videos[merged_videos["car"].isin(videos)]
-    merged_videos = merged_videos[merged_videos["feature"].isin(feature_list_visualize)]
-    app.radar_chart(merged_videos)         
+    app.radar_chart(feature_stats)
+
+# # Read df
+# vid = "data/#Merge/58.csv"
+# merged_videos = pd.read_csv(vid, header=[0], lineterminator='\n')
+
+# merged_videos = merged_videos[merged_videos["car"].isin(videos)]
+# merged_videos = merged_videos[merged_videos["feature"].isin(
+#     feature_list_visualize)]
+# app2.radar_chart(merged_videos)
