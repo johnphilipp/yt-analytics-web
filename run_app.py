@@ -23,10 +23,10 @@ model = st.sidebar.selectbox(
     'Select Model',
     sb.get_models(make))
 trim = st.sidebar.selectbox(
-    'Select Model',
+    'Select Trim',
     sb.get_trim(make, model))
 year = st.sidebar.selectbox(
-    'Select Model',
+    'Select Year',
     sb.get_year(make, model, trim))
 app.space_sidebar()
 
@@ -53,27 +53,22 @@ if len(st.session_state['video_ids_fetched']) > 0:
 # -----------------------------------------------------------------------
 
 if len(st.session_state['video_ids_fetched']) > 0:
-    columns = ["feature", "comment_count", "sentiment_mean", "car"]
-    feature_stats = pd.DataFrame(columns=columns)
-    for vid in st.session_state['video_ids_selected']:
-        current = sb.get_feature_stats(vid)
-        current['car'] = sb.get_car_from_video_id(vid)
-        # print(current.head())
-        feature_stats = pd.concat([feature_stats, current])
-        feature_stats = feature_stats[feature_stats.groupby('feature')["feature"].transform(len)
-                                      > (len(st.session_state['video_ids_fetched']) - 1)]
-        feature_stats = feature_stats.sort_values(by=['feature'])
-        feature_stats.insert(0, 'car', feature_stats.pop('car'))
-        print("")
-        print("")
-        print("")
-        print(feature_stats)
-        print("")
-        print("")
-        print("")
-        # print(st.session_state['video_ids_selected'])
-        # print(feature_stats.head())
-        print("")
+    def get_feature_stats():
+        feature_stats = pd.DataFrame(
+            columns=["feature", "comment_count", "sentiment_mean", "car"])
+        for vid in st.session_state['video_ids_selected']:
+            current = sb.get_feature_stats(vid)
+            current['car'] = sb.get_car_from_video_id(vid)
+            feature_stats = pd.concat(
+                [feature_stats, current]).sort_values(by=["feature", "car"])
+            feature_stats.insert(0, 'car', feature_stats.pop('car'))
+        return feature_stats
+
+    feature_stats = get_feature_stats()
+    feature_stats = feature_stats[feature_stats.groupby(
+        'feature')['feature'].transform('size') > (len(st.session_state['video_ids_selected']) - 1)]
+    print(len(st.session_state['video_ids_fetched']))
+    print(feature_stats)
 
     # Display videos that are in merged set
     all_videos = feature_stats["car"].unique().tolist()
