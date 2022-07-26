@@ -1,7 +1,7 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-from pathlib import Path
+from utils import sb
 
 # -----------------------------------------------------------------------
 
@@ -32,30 +32,36 @@ def human_format(num):
     return '{}{}'.format('{:f}'.format(num).rstrip('0').rstrip('.'), ['', 'K', 'M', 'B', 'T'][magnitude])
 
 
-def display_meta(video_id, meta):
-    col1, col2, col3 = st.columns([0.18, 1, 1.4])
-    col2.image(meta["thumbnail_url"], width=115)
-    col3.text(
-        human_format(int(meta["comment_count"])) + " 💬 ∙ " +
-        human_format(int(meta["view_count"])) + " 👀"
-    )
-    col3.text("by " + meta["channel_title"])
-
-    # TODO: Very buggy, need to fix; checkmark pops back
-    def _checkbox_preset_checker():
-        return video_id in st.session_state['video_ids_selected']
-    col1.markdown("")
-    col1.markdown("")
-    selected = col1.checkbox('', value=_checkbox_preset_checker(), key=video_id)\
-
-    # Keep track of elements in list
+def display_select(video_id, meta):
+    col1, col2, col3, col4, col5 = st.columns([0.5, 2, 2.2, 1.1, 1.1])
+    col2.image(meta["thumbnail_url"], width=180)
+    col3.metric(label="Channel", value=meta["channel_title"])
+    col4.metric(label="Views", value=human_format(int(meta["view_count"])))
+    col5.metric(label="Comments", value=human_format(
+        int(meta["comment_count"])))
+    col1.header("")
+    selected = col1.button('+', key=video_id + "_add")
+    # Add selected videos to list
     if selected and video_id not in st.session_state['video_ids_selected']:
-        # print("DEBUG 3")
         st.session_state['video_ids_selected'].append(video_id)
-    elif not selected and video_id in st.session_state['video_ids_selected']:
+
+
+def display_edit(video_id, meta):
+    col1, col2, col3, col4, col5 = st.columns([0.6, 3.2, 1.2, 1.2, 1.2])
+
+    col2.text(sb.get_car_from_video_id(video_id, "make") + " " +
+              sb.get_car_from_video_id(video_id, "model") + " (" +
+              sb.get_car_from_video_id(video_id, "trim") + ", " +
+              str(sb.get_car_from_video_id(video_id, "year")) + ")")
+    col3.text(meta["channel_title"])
+    col4.text(human_format(int(meta["view_count"])) + " views")
+    col5.text(human_format(int(meta["comment_count"])) + " comments")
+    selected = col1.button('-', key=video_id + "_remove")
+    # Remove selected videos from list
+    if selected and video_id in st.session_state['video_ids_selected']:
         st.session_state['video_ids_selected'].remove(video_id)
-    #     print("DEBUG 4")
-    # print(st.session_state['video_ids_selected'])
+        print("Removing ", sb.get_car_from_video_id(video_id))
+        print("Button ", selected)
 
 # -----------------------------------------------------------------------
 
