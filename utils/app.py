@@ -33,7 +33,7 @@ def human_format(num):
 
 
 def display_meta(video_id, meta):
-    col1, col2, col3 = st.sidebar.columns([0.18, 1, 1.4])
+    col1, col2, col3 = st.columns([0.18, 1, 1.4])
     col2.image(meta["thumbnail_url"], width=115)
     col3.text(
         human_format(int(meta["comment_count"])) + " 💬 ∙ " +

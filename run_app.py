@@ -11,24 +11,30 @@ import pandas as pd
 st.set_page_config(layout="centered", page_icon="🚗",
                    page_title="YouTube Comment Analyzer")
 
+st.header("What People Say About Your Product")
+app.space(2)
+
 # -----------------------------------------------------------------------
 
 # Get started section
 
 # Create dropdown with values from firebase
-make = st.sidebar.selectbox(  # can this be empty on first run?
+st.subheader("Select Car 🚗")
+make = st.selectbox(  # can this be empty on first run?
     'Select Make',
     sb.get_makes())
-model = st.sidebar.selectbox(
+model = st.selectbox(
     'Select Model',
     sb.get_models(make))
-trim = st.sidebar.selectbox(
+trim = st.selectbox(
     'Select Trim',
     sb.get_trim(make, model))
-year = st.sidebar.selectbox(
+year = st.selectbox(
     'Select Year',
     sb.get_year(make, model, trim))
-app.space_sidebar()
+app.space(2)
+st.markdown("---")
+app.space(2)
 
 # Initialize 'video_ids_fetched' session state
 if 'video_ids_fetched' not in st.session_state:
@@ -45,10 +51,13 @@ if make != "" and model != "":
 
 # Display meta content of each element (video_id) in 'video_ids_fetched' session state
 if len(st.session_state['video_ids_fetched']) > 0:
+    st.subheader("Select Videos 🎥")
     for video_id in st.session_state['video_ids_fetched']:
         meta = sb.get_meta(video_id)
         app.display_meta(video_id, meta)
-        app.space_sidebar(1)
+        app.space(2)
+        st.markdown("---")
+        app.space(2)
 
 # -----------------------------------------------------------------------
 
@@ -64,6 +73,8 @@ if len(st.session_state['video_ids_fetched']) > 0:
             feature_stats.insert(0, 'car', feature_stats.pop('car'))
         return feature_stats
 
+if len(st.session_state['video_ids_selected']) > 0:
+    st.subheader("View Sentiment 📊")
     feature_stats = get_feature_stats()
     feature_stats = feature_stats[feature_stats.groupby(
         'feature')['feature'].transform('size') > (len(st.session_state['video_ids_selected']) - 1)]
