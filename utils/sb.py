@@ -128,7 +128,7 @@ def get_makes():
     makes = []
     for i in data.data:
         makes.append(i["make"])
-    return makes
+    return sorted(set(makes))
 
 
 def get_models(make):
@@ -137,7 +137,7 @@ def get_models(make):
     models = []
     for i in data.data:
         models.append(i["model"])
-    return models
+    return sorted(set(models))
 
 
 def get_trim(make, model):
@@ -147,7 +147,7 @@ def get_trim(make, model):
     trims = []
     for i in data.data:
         trims.append(i["trim"])
-    return trims
+    return sorted(set(trims))
 
 
 def get_year(make, model, trim):
@@ -157,7 +157,7 @@ def get_year(make, model, trim):
     years = []
     for i in data.data:
         years.append(i["year"])
-    return years
+    return sorted(set(years))
 
 
 def get_video_ids_for_car(car_id):
