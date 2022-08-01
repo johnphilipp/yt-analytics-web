@@ -60,11 +60,13 @@ def home():
             columns=["feature", "comment_count", "sentiment_mean", "car"])
         for vid in st.session_state['video_ids_selected']:
             current = sb.get_feature_stats(vid)
+            car_info = sb.get_car_from_video_id(vid)
             current['car'] = \
-                sb.get_car_from_video_id(vid, "make") + " " + \
-                sb.get_car_from_video_id(vid, "model") + " (" + \
-                sb.get_car_from_video_id(vid, "trim") + ", " + \
-                str(sb.get_car_from_video_id(vid, "year")) + ")"
+                car_info["make"] + " " + \
+                car_info["model"] + " " + \
+                car_info["trim"] + " " + \
+                str(car_info["year"]) + " (" + \
+                vid + ")"
             feature_stats = pd.concat(
                 [feature_stats, current]).sort_values(by=["feature", "car"])
             feature_stats.insert(0, 'car', feature_stats.pop('car'))
@@ -83,6 +85,6 @@ def home():
 
         # Display features that are in merged set
         all_features = feature_stats["feature"].unique().tolist()
-        feature_list_visualize = st.multiselect(
-            "Edit features to visualize", all_features, all_features)
+        st.multiselect("Edit features to visualize",
+                       all_features, all_features)
         app.space(1)

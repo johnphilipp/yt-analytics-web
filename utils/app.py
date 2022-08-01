@@ -46,15 +46,16 @@ def display_select(video_id, meta):
 
 
 def display_edit(video_id, meta):
+    car_info = sb.get_car_from_video_id(video_id)
     col1, col2, col3, col4, col5 = st.columns([0.6, 3.2, 1.2, 1.2, 1.2])
     selected = col1.button('-', key=video_id)
     if selected:  # Remove selected videos from list
         st.session_state['video_ids_selected'].remove(video_id)
         st.experimental_rerun()
-    col2.text(sb.get_car_from_video_id(video_id, "make") + " " +
-              sb.get_car_from_video_id(video_id, "model") + " (" +
-              sb.get_car_from_video_id(video_id, "trim") + ", " +
-              str(sb.get_car_from_video_id(video_id, "year")) + ")")
+    col2.text(car_info["make"] + " " +
+              car_info["model"] + " (" +
+              car_info["trim"] + ", " +
+              str(car_info["year"]) + ")")
     col3.text(meta["channel_title"])
     col4.text(human_format(int(meta["view_count"])) + " views")
     col5.text(human_format(int(meta["comment_count"])) + " comments")
@@ -99,12 +100,19 @@ def radar_chart(df):
                         hover_name='car',
                         hover_data={'car': False},
                         markers=True,
-                        # labels={'rating':'stars'},
+                        # labels={'rating': 'stars'},
                         # text='car',
                         # start_angle=0,
                         range_r=[0, 5],
                         direction='clockwise')  # or counterclockwise
     fig.update_traces(fill='toself')
+    fig.update_layout(legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=-0.15,
+        xanchor="left",
+        x=0.15
+    ))
     st.write(fig)
 
 # -----------------------------------------------------------------------

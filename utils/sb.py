@@ -177,13 +177,13 @@ def get_meta(video_id):
     return data.data[0]
 
 
-def get_car_from_video_id(video_id, selection):
+def get_car_from_video_id(video_id):
     supabase = init()
     data = supabase.table("META").select(
         "car_id").eq("video_id", video_id).execute()
     data = supabase.table("CAR").select(
-        selection).eq("car_id", data.data[0]["car_id"]).execute()
-    return data.data[0][selection]
+        "*").eq("car_id", data.data[0]["car_id"]).execute()
+    return data.data[0]
 
 
 def main():
