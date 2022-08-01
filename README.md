@@ -1,12 +1,15 @@
 # What Does Youtube Think (WDYT)?
 
-What? 
+What?
+
 - Tool to analyze the sentiment of comments for any given YouTube video
 
 Why?
+
 - Automotive stakeholders (PMs, Engineers, Designers, Sales, etc.) must be aware of feedback/critique from consumers and media
 
-How? 
+How?
+
 - Downloading comments and replies of a YouTube video via YouTube API
 - Cleaning comments (e.g., removing name mentions, urls, and in some cases stopwords)
 - Calculating sentiment (from 1 (negative) to 5 (positive)) via Hugging Face's "nlptown/bert-base-multilingual-uncased-sentiment" model finetuned for sentiment analysis on product reviews in six languages

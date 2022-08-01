@@ -1,17 +1,12 @@
 import sys
 import os
 from pathlib import Path
-import yt
-import sb
-import clean
-import sentiment
-import wcloud
-import features
-
-# -----------------------------------------------------------------------
-
-main_dir = os.path.dirname(__file__)
-data_dir = os.path.join(main_dir, "../data")
+from utils import yt
+from utils import sb
+from utils import clean
+from utils import sentiment
+from utils import wcloud
+from utils import features
 
 # -----------------------------------------------------------------------
 
@@ -69,20 +64,11 @@ class Video:
         """
         return yt.get_meta(self._video_id)
 
-    def post_meta(self, db, meta):
-        """
-        Post meta data of self to Firebase.
-        """
-        return fb.post_meta(db, self._make, self._model, self._video_id, meta)
-
     def get_content_raw(self):
         """
         Return the content (comments and replies) of self via YouTube API.
         """
         return yt.get_content_raw(self._video_id)
-
-    def post_content(self, db, content_json):
-        return fb.post_content(db, self._make, self._model, self._video_id, content_json)
 
     def get_sentiment_transformers(self, df):
         """
@@ -115,15 +101,27 @@ class Video:
     #     wcloud.generate_wordcloud(self._dir, df_no_stopwords)
 
     def get_car_id(self):
+        """
+        Return car_id of a car from Supabase speciefied by Make, Model, Trim, Year.
+        """
         return sb.get_car_id(self._make, self._model, self._trim, self._year)
 
     def post_meta_supabase(self, car_id, meta):
+        """
+        Post meta data to Supabase.
+        """
         return sb.insert_meta(self._video_id, car_id, meta)
 
     def post_content_supabase(self, content):
+        """
+        Post content data to Supabase.
+        """
         return sb.insert_content(self._video_id, content)
 
     def post_sentiment_supabase(self, sentiment):
+        """
+        Post sentiment data to Supabase.
+        """
         return sb.insert_sentiment(self._video_id, sentiment)
 
 # -----------------------------------------------------------------------
@@ -133,17 +131,7 @@ class Video:
 
 def main():
     input = [
-        ["Make", "Model", "Trim", "Year", "Url"],
-        ["Tesla", "Model S", "P100D", "2020",
-            "https://www.youtube.com/watch?v=mHhZ9jk-DrU"],
-        ["Polestar", "2", "Standard", "2021",
-            "https://www.youtube.com/watch?v=gY9VVmbM2J8"],
-        ["VW", "ID.4", "Standard", "2021",
-            "https://www.youtube.com/watch?v=5rVSw9r7LQc"],
-        ["Tesla", "Model 3", "Standard", "2019",
-            "https://www.youtube.com/watch?v=kbulCM90w8w"],
-        ["Tesla", "Model Y", "Standard", "2022",
-            "https://www.youtube.com/watch?v=PZ8NPeYFPCY"]
+        ["Make", "Model", "Trim", "Year", "Url"]
     ]
 
     for i in range(1, len(input)):

@@ -34,21 +34,23 @@ def human_format(num):
 
 def display_select(video_id, meta):
     col1, col2, col3, col4, col5 = st.columns([0.5, 2, 2.2, 1.1, 1.1])
+    col1.header("")
+    selected = col1.button('+', key=video_id + "_add")
+    if selected:  # Add selected videos to list
+        st.session_state['video_ids_selected'].append(video_id)
     col2.image(meta["thumbnail_url"], width=180)
     col3.metric(label="Channel", value=meta["channel_title"])
     col4.metric(label="Views", value=human_format(int(meta["view_count"])))
     col5.metric(label="Comments", value=human_format(
         int(meta["comment_count"])))
-    col1.header("")
-    selected = col1.button('+', key=video_id + "_add")
-    # Add selected videos to list
-    if selected and video_id not in st.session_state['video_ids_selected']:
-        st.session_state['video_ids_selected'].append(video_id)
 
 
 def display_edit(video_id, meta):
     col1, col2, col3, col4, col5 = st.columns([0.6, 3.2, 1.2, 1.2, 1.2])
-
+    selected = col1.button('-', key=video_id)
+    if selected:  # Remove selected videos from list
+        st.session_state['video_ids_selected'].remove(video_id)
+        st.experimental_rerun()
     col2.text(sb.get_car_from_video_id(video_id, "make") + " " +
               sb.get_car_from_video_id(video_id, "model") + " (" +
               sb.get_car_from_video_id(video_id, "trim") + ", " +
@@ -56,12 +58,6 @@ def display_edit(video_id, meta):
     col3.text(meta["channel_title"])
     col4.text(human_format(int(meta["view_count"])) + " views")
     col5.text(human_format(int(meta["comment_count"])) + " comments")
-    selected = col1.button('-', key=video_id + "_remove")
-    # Remove selected videos from list
-    if selected and video_id in st.session_state['video_ids_selected']:
-        st.session_state['video_ids_selected'].remove(video_id)
-        print("Removing ", sb.get_car_from_video_id(video_id))
-        print("Button ", selected)
 
 # -----------------------------------------------------------------------
 

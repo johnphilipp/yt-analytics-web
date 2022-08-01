@@ -1,3 +1,5 @@
+data/
+components/__pycache__/
 utils/__pycache__/
 .code-workspace
 .DS_Store
