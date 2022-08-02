@@ -4,11 +4,9 @@ import streamlit as st
 
 def request():
     # Submit Request
-
-    st.subheader("Submit Request 🚗")
     app.space(1)
-
     with st.form(key='my_form'):
+        st.write("Request to add a new car and/or video")
         make_r = st.text_input('Make')
         model_r = st.text_input('Model')
         trim_r = st.text_input('Trim')

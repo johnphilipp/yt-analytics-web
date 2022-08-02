@@ -2,6 +2,9 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 from utils import sb
+from wordcloud import WordCloud
+from utils import clean
+import matplotlib.pyplot as plt
 
 # -----------------------------------------------------------------------
 
@@ -48,7 +51,7 @@ def display_select(video_id, meta):
 def display_edit(video_id, meta):
     car_info = sb.get_car_from_video_id(video_id)
     col1, col2, col3, col4, col5 = st.columns([0.6, 3.2, 1.2, 1.2, 1.2])
-    selected = col1.button('-', key=video_id)
+    selected = col1.button('-', key=video_id + "_remove")
     if selected:  # Remove selected videos from list
         st.session_state['video_ids_selected'].remove(video_id)
         st.experimental_rerun()
@@ -114,6 +117,26 @@ def radar_chart(df):
         x=0.15
     ))
     st.write(fig)
+
+
+def wordcloud(df):
+    # Generate and save a wordcloud
+    # from PIL import Image
+    # image = Image.open('sunrise.jpg')
+    # st.image(image, caption='Sunrise by the mountains')
+
+    df = clean.basic_clean(df)
+    df = clean.remove_stopwords(df)
+    all_words = " ".join([w for w in df["content_no_stopwords"]])
+    wordcloud = WordCloud(width=500, height=300, random_state=21,
+                          max_font_size=119).generate(all_words)
+
+    plt.imshow(wordcloud, interpolation="bilinear")
+    plt.axis("off")
+    # return plt
+    plt.savefig(
+        "/Users/philippjohn/Developer/yt-analytics-web/data/wordcloud.jpg")
+
 
 # -----------------------------------------------------------------------
 

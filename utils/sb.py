@@ -71,6 +71,16 @@ def insert_sentiment(video_id, sentiment):
     return "Insert executed"
 
 
+def get_content(video_id):
+    supabase = init()
+    data = supabase.table("SENTIMENT").select(
+        "content").eq("video_id", video_id).execute()
+    df = []
+    for i in data.data:
+        df.append(i["content"])
+    return df
+
+
 def get_feature_stats(video_id):
     feature_list = [
         "rim", "steering wheel", "engine", "color", "colour", "carbon", "light", "design", "sound", "interior", "exterior", "mirror", "body",
@@ -81,12 +91,12 @@ def get_feature_stats(video_id):
         "content", "sentiment_score").eq("video_id", video_id).execute()
     df = pd.DataFrame(data.data)
 
-    def get_features(df, feature_list):
+    def _get_features(df, feature_list):
         # Remove NaNs
         df = df[df["content"].notnull()]
 
         # Func which returns df of a single feature
-        def get_single_feature(df, feature):
+        def _get_single_feature(df, feature):
             df_single_feature = pd.DataFrame()
             df_single_feature = pd.concat(
                 [df_single_feature, df[df["content"].str.lower().str.contains(feature)]], axis=0)
@@ -97,13 +107,13 @@ def get_feature_stats(video_id):
         df_features = pd.DataFrame()
         for feature in feature_list:
             df_features = pd.concat(
-                [df_features, get_single_feature(df, feature)], axis=0)
+                [df_features, _get_single_feature(df, feature)], axis=0)
 
         return df_features
 
-    df_features = get_features(df, feature_list)
+    df_features = _get_features(df, feature_list)
 
-    def get_feature_stats(df_features, feature_list):
+    def _get_feature_stats(df_features, feature_list):
         df_feature_stats = []
         for feature in feature_list:
             df_feature_stats.append([feature,
@@ -119,7 +129,7 @@ def get_feature_stats(video_id):
 
         return df_feature_stats
 
-    return get_feature_stats(df_features, feature_list)
+    return _get_feature_stats(df_features, feature_list)
 
 
 def get_makes():
@@ -188,10 +198,11 @@ def get_car_from_video_id(video_id):
 
 def main():
     # print(get_feature_stats("mHhZ9jk-DrU"))
-    print(get_makes())
-    print(get_models("Polestar"))
-    print(get_meta("mHhZ9jk-DrU"))
-    print(get_car_from_video_id("mHhZ9jk-DrU"))
+    # print(get_makes())
+    # print(get_models("Polestar"))
+    # print(get_meta("mHhZ9jk-DrU"))
+    # print(get_car_from_video_id("mHhZ9jk-DrU"))
+    print(get_content("mHhZ9jk-DrU"))
 
 
 if __name__ == '__main__':
