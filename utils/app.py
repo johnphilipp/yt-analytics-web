@@ -1,10 +1,6 @@
 import streamlit as st
-import plotly.express as px
 import pandas as pd
 from utils import sb
-from wordcloud import WordCloud
-from utils import clean
-import matplotlib.pyplot as plt
 
 # -----------------------------------------------------------------------
 
@@ -88,54 +84,6 @@ def merge_df(videos):
     df = df.sort_values(by=['feature'])
     df.insert(0, 'car', df.pop('car'))
     df.insert(1, 'channel', df.pop('channel'))
-
-
-# -----------------------------------------------------------------------
-
-
-def radar_chart(df):
-    fig = px.line_polar(df,
-                        r='sentiment_mean',
-                        theta='feature',
-                        color='car',
-                        line_close=True,
-                        line_shape='linear',  # or spline
-                        hover_name='car',
-                        hover_data={'car': False},
-                        markers=True,
-                        # labels={'rating': 'stars'},
-                        # text='car',
-                        # start_angle=0,
-                        range_r=[0, 5],
-                        direction='clockwise')  # or counterclockwise
-    fig.update_traces(fill='toself')
-    fig.update_layout(legend=dict(
-        orientation="h",
-        yanchor="top",
-        y=-0.15,
-        xanchor="left",
-        x=0.15
-    ))
-    st.write(fig)
-
-
-def wordcloud(df):
-    # Generate and save a wordcloud
-    # from PIL import Image
-    # image = Image.open('sunrise.jpg')
-    # st.image(image, caption='Sunrise by the mountains')
-
-    df = clean.basic_clean(df)
-    df = clean.remove_stopwords(df)
-    all_words = " ".join([w for w in df["content_no_stopwords"]])
-    wordcloud = WordCloud(width=500, height=300, random_state=21,
-                          max_font_size=119).generate(all_words)
-
-    plt.imshow(wordcloud, interpolation="bilinear")
-    plt.axis("off")
-    # return plt
-    plt.savefig(
-        "/Users/philippjohn/Developer/yt-analytics-web/data/wordcloud.jpg")
 
 
 # -----------------------------------------------------------------------
