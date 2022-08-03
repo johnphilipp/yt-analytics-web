@@ -81,6 +81,16 @@ def get_content(video_id):
     return df
 
 
+def get_content_and_sentiment(video_id):
+    supabase = init()
+    data = supabase.table("SENTIMENT").select(
+        "content", "sentiment_score").eq("video_id", video_id).execute()
+    df = []
+    for i in data.data:
+        df.append([i["content"], i["sentiment_score"]])
+    return df
+
+
 def get_feature_stats(video_id):
     feature_list = [
         "rim", "steering wheel", "engine", "color", "colour", "carbon", "light", "design", "sound", "interior", "exterior", "mirror", "body",

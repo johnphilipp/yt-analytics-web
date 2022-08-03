@@ -2,13 +2,28 @@ import streamlit as st
 import pandas as pd
 from utils import sb
 
+
 # -----------------------------------------------------------------------
 
 # https://github.com/streamlit/example-app-commenting/blob/main/utils/chart.py
 # https://share.streamlit.io/streamlit/example-app-commenting/main
 
+
 # -----------------------------------------------------------------------
 
+# Helper func -- Get car info from video_id
+
+def get_car_info(video_id):
+    car_info = sb.get_car_from_video_id(video_id)
+    car_info_string = car_info["make"] + " " + \
+        car_info["model"] + " " + \
+        car_info["trim"] + " " + \
+        str(car_info["year"]) + " (" + \
+        video_id + ")"
+    return car_info_string
+
+
+# -----------------------------------------------------------------------
 
 def space(num_lines=1):
     """Adds empty lines to the Streamlit app."""

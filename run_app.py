@@ -1,10 +1,10 @@
 from components import header
-from components import select_cars
-from components import edit_selection
-from components import view_analysis
+from components import select
+from components import edit
+from components import analysis
 
 
 header.header()
-select_cars.select_cars()
-edit_selection.edit_selection()
-view_analysis.view_analysis()
+select.select_cars()
+edit.edit_selection()
+analysis.view_analysis()

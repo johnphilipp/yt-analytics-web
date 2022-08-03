@@ -6,12 +6,8 @@ import pandas as pd
 
 
 def get_defined_feature_list():
-    feature_list = ["rim", "steering wheel", "engine", "color", "colour",
-                    "carbon", "light", "design", "sound", "interior",
-                    "exterior", "mirror", "body", "brake", "chassis",
-                    "suspension", "gearbox", "navigation", "infotainment",
-                    "power", "acceleration", "handling", "range", "battery",
-                    "screen"]
+    feature_list = ["rim", "steering wheel", "engine", "color", "colour", "carbon", "light", "design", "sound", "interior", "exterior", "mirror", "body", "brake", "chassis", "suspension",
+                    "gearbox", "navigation", "infotainment", "power", "acceleration", "handling", "range", "battery", "screen", "styling", "safety", "speed", "sustainability", "connectivity"]
     return feature_list
 
 # -----------------------------------------------------------------------
