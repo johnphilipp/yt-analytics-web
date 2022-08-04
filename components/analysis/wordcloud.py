@@ -1,7 +1,6 @@
 from utils import clean
 from utils import sb
 from utils import app
-from utils import features
 import streamlit as st
 import pandas as pd
 from wordcloud import WordCloud
@@ -9,6 +8,10 @@ import matplotlib.pyplot as plt
 import io
 import re
 import spacy
+
+#
+# TODO: Select feature select box should only show features that are in content
+#
 
 
 # -----------------------------------------------------------------------
@@ -72,7 +75,7 @@ def get_wordcloud():
 
     # Display selectbox for feature
     feature = st.selectbox(
-        "Select feature", features.get_defined_feature_list())
+        "Select feature", app.get_defined_feature_list())
 
     # Get df with content that only includes mention of feature + only keep adjectives
     selected_video_id = re.search(

@@ -68,7 +68,6 @@ def get_meta(vid):
 # Return a list with comments data
 
 def _get_comments(vid):
-    print("Getting comments")
     # -*- coding: utf-8 -*-
 
     # Sample Python code for youtube.comments.list
@@ -112,8 +111,6 @@ def _get_comments(vid):
         comments.append(page)
         pageToken = page.get("nextPageToken")
 
-    # print(comments)
-
     return comments
 
 # -----------------------------------------------------------------------
@@ -122,7 +119,6 @@ def _get_comments(vid):
 
 
 def _get_replies(comments):
-    print("Getting replies")
     # Disable OAuthlib's HTTPS verification when running locally.
     # *DO NOT* leave this option enabled in production.
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -167,8 +163,6 @@ def _get_replies(comments):
             replies.append(page)
             pageToken = page.get("nextPageToken")
 
-    # print(replies)
-
     return replies
 
 # -----------------------------------------------------------------------
@@ -177,7 +171,6 @@ def _get_replies(comments):
 
 
 def get_content_raw(vid):
-    print("Getting content")
     # Get comments and replies data for video id
     comments = _get_comments(vid)
     replies = _get_replies(comments)

@@ -1,14 +1,18 @@
 from utils import sb
 from utils import app
 import streamlit as st
-from streamlit_option_menu import option_menu
 import pandas as pd
 import plotly.express as px
+
+#
+# TODO: Add slider to select how many comments minimum (default 5)
+#
 
 
 # -----------------------------------------------------------------------
 
 # Helper func -- Generatenmb and display sentiment radar chart
+
 
 def _get_radar_chart(df):
     fig = px.line_polar(df,

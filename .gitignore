@@ -1,5 +1,10 @@
 __pycache__
 components/__pycache__/
+components/analysis/__pycache__/
+components/edit/__pycache__/
+components/header/__pycache__/
+components/request/__pycache__/
+components/select/__pycache__/
 utils/__pycache__/
 .code-workspace
 .DS_Store

@@ -1,14 +1,14 @@
-from utils import clean
 from utils import sb
 from utils import app
-from utils import features
 import streamlit as st
 import pandas as pd
-from wordcloud import WordCloud
-import matplotlib.pyplot as plt
-import io
 import re
-import spacy
+
+#
+# TODO: Add like count -- need to change 'video.py' while YT data is fetched
+# TODO: Often sentiment is calculated wrong (e.g., irony) -- how to fix? Fix e.g., by not showing sentiment, just display top 5 but without sentiment score, maybe with like count tho
+# TODO: Change how number of comments is displayed
+#
 
 
 # -----------------------------------------------------------------------
@@ -38,7 +38,7 @@ def get_topflop():
 
     # Display selectbox for feature
     feature = st.selectbox(
-        "Select feature", features.get_defined_feature_list())
+        "Select feature", app.get_defined_feature_list())
 
     # Get df with content that only includes mention of feature + only keep adjectives
     selected_video_id = re.search(
@@ -48,6 +48,7 @@ def get_topflop():
     df_feature = _get_single_feature(
         df, feature).sort_values(by=["sentiment_score"])
     df_feature_top = df_feature.iloc[-5:]
+    df_feature_top = df_feature_top.iloc[::-1]
     df_feature_flop = df_feature.iloc[:5]
 
     app.space(1)
@@ -64,7 +65,7 @@ def get_topflop():
     # TODO: Reverse list
     for i in range(0, len(df_feature_top["content"].values.tolist())):
         col1, col2, col3 = st.columns([1, 1, 5])
-        col1.markdown(i)
+        col1.markdown(i+1)
         col2.markdown(
             df_feature_top["sentiment_score"].values.tolist()[i])
         col3.markdown(
@@ -78,7 +79,7 @@ def get_topflop():
     col2.markdown("**Sentiment**")
     col3.markdown("**Content**")
     for i in range(0, len(df_feature_flop["content"].values.tolist())):
-        col1, col2, col3 = st.columns([0.2, 0.2, 5])
-        col1.markdown(i)
+        col1, col2, col3 = st.columns([1, 1, 5])
+        col1.markdown(i+1)
         col2.markdown(df_feature_flop["sentiment_score"].values.tolist()[i])
         col3.markdown(df_feature_flop["content"].values.tolist()[i])

@@ -2,8 +2,11 @@ from utils import app
 import streamlit as st
 
 
+# -----------------------------------------------------------------------
+
+# Request car/video to be added to app
+
 def request():
-    # Submit Request
     app.space(1)
     with st.form(key='my_form'):
         st.write("Request to add a new car and/or video")

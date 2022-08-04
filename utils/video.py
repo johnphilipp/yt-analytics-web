@@ -5,11 +5,11 @@ from utils import yt
 from utils import sb
 from utils import clean
 from utils import sentiment
-from utils import wcloud
-from utils import features
+
 
 # -----------------------------------------------------------------------
 
+# ETL: Extract video data from YouTube, Transform, Load into Supabase
 
 class Video:
     def __init__(self, make, model, trim, year, url):
@@ -19,7 +19,6 @@ class Video:
         self._year = year
         self._url = url
         self._video_id = self._parse_video_id(url)
-        # Path(self._dir).mkdir(parents=True, exist_ok=True)
 
     def _parse_video_id(self, url):
         """
@@ -84,22 +83,6 @@ class Video:
         df_basic_clean = clean.basic_clean(df)
         return sentiment.sentiment_textblob(df_basic_clean)
 
-    def get_feature_stats(self, df, feature_list):
-        """
-        Return the feature stats of self.
-        """
-        df_features = features.get_features(df, feature_list)
-        return features.get_feature_stats(df_features, feature_list)
-
-    # def get_wordcloud(self):
-    #     """
-    #     Return the wordcloud of self.
-    #     """
-    #     df = pd.read_csv(self._dir + "/content_clean.csv", header=[0], lineterminator='\n')
-    #     df = df.drop(['Unnamed: 0'], axis=1, errors='ignore')
-    #     df_no_stopwords = clean.remove_stopwords(self._dir, df)
-    #     wcloud.generate_wordcloud(self._dir, df_no_stopwords)
-
     def get_car_id(self):
         """
         Return car_id of a car from Supabase speciefied by Make, Model, Trim, Year.
@@ -124,10 +107,10 @@ class Video:
         """
         return sb.insert_sentiment(self._video_id, sentiment)
 
+
 # -----------------------------------------------------------------------
 
 # Testing
-
 
 def main():
     input = [
@@ -171,28 +154,6 @@ def main():
         # 3.2) Post sentiment
         print("3.2) Post sentiment")
         print(video.post_sentiment_supabase(sentiment))
-
-    # -----------------------------------------------------------------------
-
-    # # 4) Feature stats
-    # # 4.1) Get feature stats
-    # print("\n4) Feature stats (" + video.get_video_id() + ")")
-    # print("4.1) Get feature stats")
-    # feature_list = features.get_defined_feature_list()
-    # key = "feature_stats"
-    # feature_stats_df = video.get_feature_stats(sentiment_1_df, feature_list)
-    # feature_stats_json = {key: feature_stats_df.to_dict()}
-    # print(feature_stats_json[key])
-    # # 4.2) Post feature stats
-    # print("4.2) Post feature stats")
-    # print(video.post_content(db, feature_stats_json))
-
-    # #-----------------------------------------------------------------------
-
-    # # 5) Generate wordcloud
-    # print("")
-    # print("3) Generate wordcloud")
-    # video.get_wordcloud()
 
 
 if __name__ == '__main__':

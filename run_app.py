@@ -1,7 +1,7 @@
-from components import header
-from components import select
-from components import edit
-from components import analysis
+from components.header import header
+from components.select import select
+from components.edit import edit
+from components.analysis import analysis
 
 
 header.header()
