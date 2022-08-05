@@ -1,6 +1,6 @@
 from utils import app
 from components.analysis import sentiment
-from components.analysis import wordcloud
+from components.analysis import wcloud
 from components.analysis import topflop
 import streamlit as st
 from streamlit_option_menu import option_menu
@@ -25,7 +25,7 @@ def view_analysis():
             sentiment.get_sentiment()
 
         elif menu == "Wordcloud":
-            wordcloud.get_wordcloud()
+            wcloud.get_wordcloud()
 
         elif menu == "Top/Flop":
             topflop.get_topflop()
