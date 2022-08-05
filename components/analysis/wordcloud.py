@@ -10,6 +10,7 @@ import re
 import spacy
 
 #
+# TODO: Change to Treemap? https://plotly.com/python/treemaps/
 # TODO: Select feature select box should only show features that are in content
 #
 
