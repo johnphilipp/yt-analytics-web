@@ -4,7 +4,7 @@ nltk==3.7
 numpy==1.22.4
 pandas==1.4.2
 plotly==5.8.2
-spacy==3.3.1
+spacy
 streamlit==1.10.0
 streamlit_option_menu==0.3.2
 supabase==0.5.8
