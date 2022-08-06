@@ -56,6 +56,9 @@ def select_cars():
     # Display meta content of each element (video_id) in 'video_ids_fetched' session state
     st.subheader("Select Videos 🎥")
     app.space(1)
+    st.write("+ Select all")
+    st.write("+ Player")
+    st.write("+ Animate comment numbers")
     if make != "" and model != "" and trim != "" and year != "":
         car_id = sb.get_car_id(make, model, trim, year)
         for video_id in sb.get_video_ids_for_car(car_id):
