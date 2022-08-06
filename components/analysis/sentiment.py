@@ -32,10 +32,10 @@ def _get_radar_chart(df):
     fig.update_traces(fill='toself')
     fig.update_layout(legend=dict(
         orientation="h",
-        yanchor="top",
-        y=-0.15,
-        xanchor="left",
-        x=0.15
+        yanchor="bottom",
+        y=-0.5,
+        xanchor="right",
+        x=1
     ))
     st.plotly_chart(fig, use_container_width=True)
 
