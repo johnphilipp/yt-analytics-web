@@ -180,7 +180,7 @@ def get_year(make, model, trim):
     return sorted(set(years))
 
 
-def get_video_ids_for_car(car_id):
+def get_video_ids_for_car_id(car_id):
     supabase = init()
     data = supabase.table("META").select(
         "video_id").eq("car_id", car_id).execute()
@@ -204,6 +204,26 @@ def get_car_from_video_id(video_id):
     data = supabase.table("CAR").select(
         "*").eq("car_id", data.data[0]["car_id"]).execute()
     return data.data[0]
+
+
+def get_cars_ids_for_make(make):
+    supabase = init()
+    data = supabase.table("CAR").select(
+        "car_id").eq("make", make).execute()
+    makes = []
+    for i in data.data:
+        makes.append(i["car_id"])
+    return makes
+
+
+def get_cars_ids_for_make_and_model(make, model):
+    supabase = init()
+    data = supabase.table("CAR").select(
+        "car_id").eq("make", make).eq("model", model).execute()
+    makes = []
+    for i in data.data:
+        makes.append(i["car_id"])
+    return makes
 
 
 def main():
