@@ -1,9 +1,10 @@
 import streamlit as st
 from utils import app
 from utils import sb
+from stlib import _x_button_clicked
+from stlib import _x_button_set_text
 
 #
-# TODO: Add "Select all videos" button
 # TODO: Add built-in video vierwer
 # TODO: Animate comment numbers"
 #
@@ -33,9 +34,6 @@ def _form():
     if "car_selected" not in st.session_state:
         st.session_state["car_selected"] = []
 
-    if "video_ids_selected" not in st.session_state:
-        st.session_state["video_ids_selected"] = []
-
     with st.container():
         st.subheader("Select a car to get started 🚗")
 
@@ -59,47 +57,14 @@ def _form():
         year = col4.selectbox("Select Year", years)
         app.space(1)
 
-    if ((make != "" and make != "Make") and (model == "" or model == "Model")):
-        available_car_ids = sb.get_cars_ids_for_make(make)
-        print(available_car_ids)
-        available_video_ids = []
-        for car_id in available_car_ids:
-            for video_id in sb.get_video_ids_for_car_id(car_id):
-                available_video_ids.append(video_id)
-        st.session_state["video_count"] = str(len(available_video_ids))
-        print("Len 1: " + st.session_state["video_count"])
-
-    if ((make != "" and make != "Make") and (model != "" and model != "Model")):
-        available_car_ids = sb.get_cars_ids_for_make_and_model(make, model)
-        print(available_car_ids)
-        available_video_ids = []
-        for car_id in available_car_ids:
-            for video_id in sb.get_video_ids_for_car_id(car_id):
-                available_video_ids.append(video_id)
-        st.session_state["video_count"] = str(len(available_video_ids))
-        print("Len 2: " + st.session_state["video_count"])
+    _x_button_set_text.run(make, model, trim, year)
 
     button = st.button("See all {} videos".format(
         st.session_state["video_count"]))
     app.space(1)
 
     if button:
-        if (make == "" or make == "Make"):
-            st.markdown("ℹ️ Please select a *Make* first")
-            button = False
-        elif (make != "" and make != "Make") and (model != "" and model != "Model") and (trim != "" and trim != "Trim") and (year != "" and year != "Year"):
-            st.session_state["car_selected"] = {
-                "make": make,
-                "model": model,
-                "trim": trim,
-                "year": year
-            }
-            car_id = sb.get_car_id(make, model, trim, year)
-            available_video_ids = sb.get_video_ids_for_car_id(car_id)
-            st.session_state["video_ids_selected"] = available_video_ids
-            st.session_state["home"] = False
-            st.session_state["catalogue"] = True
-            st.experimental_rerun()
+        _x_button_clicked.run(make, model, trim, year)
 
 
 # -----------------------------------------------------------------------

@@ -1,6 +1,8 @@
 import streamlit as st
 from utils import app
 from utils import sb
+from stlib import _x_button_clicked
+from stlib import _x_button_set_text
 import time
 
 
@@ -9,60 +11,44 @@ import time
 # Sidebar
 
 def sidebar():
-    print(st.session_state["car_selected"])
     with st.sidebar:
         makes = sb.get_makes()
+        makes.insert(0, "Make")
         if st.session_state["car_selected"] and st.session_state["catalogue_first_run"]:
             index = makes.index(st.session_state["car_selected"]["make"])
             st.session_state.makes = makes[index]
-        makes.insert(0, "Make")
         make = st.selectbox("Select Make", makes, key='makes')
 
         models = sb.get_models(make)
+        models.insert(0, "Model")
         if st.session_state["car_selected"] and st.session_state["catalogue_first_run"]:
             index = models.index(st.session_state["car_selected"]["model"])
             st.session_state.models = models[index]
-        models.insert(0, "Model")
         model = st.selectbox("Select Model", models, key='models')
 
         trims = sb.get_trim(make, model)
+        trims.insert(0, "Trim")
         if st.session_state["car_selected"] and st.session_state["catalogue_first_run"]:
             index = trims.index(st.session_state["car_selected"]["trim"])
             st.session_state.trims = trims[index]
-        trims.insert(0, "Trim")
         trim = st.selectbox("Select Trim", trims, key='trims')
 
         years = sb.get_year(make, model, trim)
+        years.insert(0, "Year")
         if st.session_state["car_selected"] and st.session_state["catalogue_first_run"]:
             index = years.index(st.session_state["car_selected"]["year"])
             st.session_state.years = years[index]
-        years.insert(0, "Year")
         year = st.selectbox("Select Year", years, key='years')
         app.space(1)
+
+        _x_button_set_text.run(make, model, trim, year)
 
         button = st.button("See all {} videos".format(
             st.session_state["video_count"]))
         app.space(1)
 
         if button:
-            if (make == "" or make == "Make"):
-                st.markdown("ℹ️ Please select a *Make* first")
-                button = False
-            elif (make != "" and make != "Make") and (model != "" and model != "Model") and (trim != "" and trim != "Trim") and (year != "" and year != "Year"):
-                st.session_state["car_selected"] = {
-                    "make": make,
-                    "model": model,
-                    "trim": trim,
-                    "year": year
-                }
-                car_id = sb.get_car_id(make, model, trim, year)
-                available_video_ids = sb.get_video_ids_for_car_id(car_id)
-                st.session_state["video_ids_selected"] = available_video_ids
-                st.session_state["home"] = False
-                st.session_state["catalogue"] = True
-                st.experimental_rerun()
-
-            st.session_state["catalogue_first_run"] = False
+            _x_button_clicked.run(make, model, trim, year)
 
 
 # -----------------------------------------------------------------------
@@ -78,9 +64,25 @@ def _catalogue_tile(video_id, meta):
     col4.metric(label="Comments", value=app.human_format(
         int(meta["comment_count"])))
     col5.text("")
-    selected_add = col5.button('Add to Analysis', key=video_id + "_add")
-    if selected_add and video_id not in st.session_state['video_ids_selected']:
-        st.session_state['video_ids_selected'].append(video_id)
+    selected_add = col5.button("View Analysis", key=video_id + "_add")
+
+    if selected_add:
+        if "video_ids_selected" not in st.session_state:
+            st.session_state["video_ids_selected"] = []
+        st.session_state["video_ids_selected"].append(video_id)
+        st.session_state["catalogue"] = False
+        st.session_state["analysis"] = True
+        print(st.session_state["video_ids_selected"])
+        print(st.session_state["catalogue"])
+        print(st.session_state["analysis"])
+        print("")
+        st.experimental_rerun()
+
+    # selected_add = col5.button('View Analysis', key=video_id + "_add")
+    # if selected_add and video_id not in st.session_state['video_ids_selected']:
+    #     st.session_state['video_ids_selected'].append(video_id)
+
+    # TODO: Switch page if button clicked
 
 # -----------------------------------------------------------------------
 
@@ -88,7 +90,7 @@ def _catalogue_tile(video_id, meta):
 
 
 def catalogue():
-    for video_id in st.session_state["video_ids_selected"]:
+    for video_id in st.session_state["available_video_ids"]:
         _catalogue_tile(video_id, sb.get_meta(video_id))
         app.space(2)
 
@@ -103,6 +105,7 @@ def run():
             time.sleep(1)
     sidebar()
     catalogue()
+    st.session_state["catalogue_first_run"] = False
 
 
 if __name__ == "__main__":

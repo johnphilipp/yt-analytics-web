@@ -210,20 +210,30 @@ def get_cars_ids_for_make(make):
     supabase = init()
     data = supabase.table("CAR").select(
         "car_id").eq("make", make).execute()
-    makes = []
+    car_ids = []
     for i in data.data:
-        makes.append(i["car_id"])
-    return makes
+        car_ids.append(i["car_id"])
+    return car_ids
 
 
-def get_cars_ids_for_make_and_model(make, model):
+def get_cars_ids_for_make_model(make, model):
     supabase = init()
     data = supabase.table("CAR").select(
         "car_id").eq("make", make).eq("model", model).execute()
-    makes = []
+    car_ids = []
     for i in data.data:
-        makes.append(i["car_id"])
-    return makes
+        car_ids.append(i["car_id"])
+    return car_ids
+
+
+def get_cars_ids_for_make_model_trim(make, model, trim):
+    supabase = init()
+    data = supabase.table("CAR").select(
+        "car_id").eq("make", make).eq("model", model).eq("trim", trim).execute()
+    car_ids = []
+    for i in data.data:
+        car_ids.append(i["car_id"])
+    return car_ids
 
 
 def main():

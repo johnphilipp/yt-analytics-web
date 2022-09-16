@@ -13,6 +13,9 @@ if "home" not in st.session_state:
 if "catalogue" not in st.session_state:
     st.session_state["catalogue"] = False
 
+if "analysis" not in st.session_state:
+    st.session_state["analysis"] = False
+
 if st.session_state["home"]:
     _1_home.run()
 
@@ -20,3 +23,8 @@ if st.session_state["catalogue"]:
     if "catalogue_first_run" not in st.session_state:
         st.session_state["catalogue_first_run"] = True
     _2_catalogue.run()
+
+if st.session_state["analysis"]:
+    if "analysis_first_run" not in st.session_state:
+        st.session_state["analysis_first_run"] = True
+    _3_analysis.run()
