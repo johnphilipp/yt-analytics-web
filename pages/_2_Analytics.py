@@ -37,14 +37,14 @@ def _edit(video_id, meta):
 def view_analysis():
     if len(st.session_state['video_ids_selected']) > 0:
         if len(st.session_state['video_ids_selected']) > 0:
-            with st.expander("Edit Selection"):
+            with st.expander("Edit selection 🚗"):
                 app.space(1)
                 for video_id in st.session_state['video_ids_selected']:
                     _edit(video_id, sb.get_meta(video_id))
         app.space(1)
 
         menu = option_menu(None, ["Sentiment", "Wordcloud", "Top/Flop"],
-                           icons=['bar-chart', 'type', 'star-half'],
+                           icons=['bar-chart-fill', 'type', 'star-half'],
                            menu_icon="cast", default_index=0, orientation="horizontal")
 
         if menu == "Sentiment":
