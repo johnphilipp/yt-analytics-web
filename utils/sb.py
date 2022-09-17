@@ -9,11 +9,18 @@ def init():
     return create_client(url, key)
 
 
-def get_car_id(make, model, trim, year):
+def get_car_id(make, model, trim, year, form_previews):
     supabase = init()
 
     def query():
-        return supabase.table("CAR").select("car_id").eq("make", make).eq("model", model).eq("trim", trim).eq("year", year).execute()
+        if (make != "" and make != form_previews["make"]) and (model != "" and model != form_previews["model"]) and (trim != "" and trim != form_previews["trim"]) and (year != "" and year != form_previews["year"]):
+            return supabase.table("CAR").select("car_id").eq("make", make).eq("model", model).eq("trim", trim).eq("year", year).execute()
+        elif (make != "" and make != form_previews["make"]) and (model != "" and model != form_previews["model"]) and (trim != "" and trim != form_previews["trim"]):
+            return supabase.table("CAR").select("car_id").eq("make", make).eq("model", model).eq("trim", trim).execute()
+        elif (make != "" and make != form_previews["make"]) and (model != "" and model != form_previews["model"]):
+            return supabase.table("CAR").select("car_id").eq("make", make).eq("model", model).execute()
+        elif (make != "" and make != form_previews["make"]):
+            return supabase.table("CAR").select("car_id").eq("make", make).execute()
     data = query()
     if len(data.data) == 0:
         supabase.table("CAR").insert({
@@ -27,7 +34,10 @@ def get_car_id(make, model, trim, year):
     elif len(data.data) == 1:
         return data.data[0]["car_id"]
     elif len(data.data) > 1:
-        print("More than one car found. Cars should be unique. Check db")
+        car_ids = []
+        for i in data.data:
+            car_ids.append(i["car_id"])
+        return car_ids
     else:
         print("Error when trying to retrieve car ({}, {}, {}, {}) from db". format(
             make, model, trim, year))
@@ -204,36 +214,6 @@ def get_car_from_video_id(video_id):
     data = supabase.table("CAR").select(
         "*").eq("car_id", data.data[0]["car_id"]).execute()
     return data.data[0]
-
-
-def get_cars_ids_for_make(make):
-    supabase = init()
-    data = supabase.table("CAR").select(
-        "car_id").eq("make", make).execute()
-    car_ids = []
-    for i in data.data:
-        car_ids.append(i["car_id"])
-    return car_ids
-
-
-def get_cars_ids_for_make_model(make, model):
-    supabase = init()
-    data = supabase.table("CAR").select(
-        "car_id").eq("make", make).eq("model", model).execute()
-    car_ids = []
-    for i in data.data:
-        car_ids.append(i["car_id"])
-    return car_ids
-
-
-def get_cars_ids_for_make_model_trim(make, model, trim):
-    supabase = init()
-    data = supabase.table("CAR").select(
-        "car_id").eq("make", make).eq("model", model).eq("trim", trim).execute()
-    car_ids = []
-    for i in data.data:
-        car_ids.append(i["car_id"])
-    return car_ids
 
 
 def main():

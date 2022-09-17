@@ -13,7 +13,7 @@ import re
 
 # -----------------------------------------------------------------------
 
-# Helper func -- Returns df of a single feature
+# Returns df of a single feature
 
 def _get_single_feature(df, feature):
     df = df[df["content"].notnull()]
@@ -26,7 +26,7 @@ def _get_single_feature(df, feature):
 
 # -----------------------------------------------------------------------
 
-# Main func -- Generate and display top flop comments
+# Generate and display top flop comments
 
 def get_topflop():
     # Display selectbox for car/video

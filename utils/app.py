@@ -4,7 +4,7 @@ from utils import sb
 
 # -----------------------------------------------------------------------
 
-# Helper func -- Get car info from video_id
+# Get defined feature list
 
 def get_defined_feature_list():
     feature_list = ["rim", "steering wheel", "engine", "color", "colour", "carbon", "light", "design", "sound", "interior", "exterior", "mirror", "body", "brake", "chassis", "suspension",
@@ -14,7 +14,7 @@ def get_defined_feature_list():
 
 # -----------------------------------------------------------------------
 
-# Helper func -- Get car info from video_id
+# Get car info from video_id
 
 def get_car_info(video_id):
     car_info = sb.get_car_from_video_id(video_id)

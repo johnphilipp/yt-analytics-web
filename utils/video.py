@@ -9,7 +9,7 @@ from utils import sentiment
 
 # -----------------------------------------------------------------------
 
-# ETL: Extract video data from YouTube, Transform, Load into Supabase
+# Extract video data from YouTube, Transform, Load into Supabase
 
 class Video:
     def __init__(self, make, model, trim, year, url):

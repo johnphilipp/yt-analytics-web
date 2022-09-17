@@ -4,10 +4,10 @@ import numpy as np
 import os
 import toml
 
+
 # -----------------------------------------------------------------------
 
 # Return api keys
-
 
 def _get_youtube_api_key():
     return toml.load(".streamlit/secrets.toml")["youtube_key"]["youtube_key"]
@@ -20,10 +20,10 @@ def _get_firebase_api_key():
 def _get_firebase_storage_path():
     return toml.load(".streamlit/secrets.toml")["firebase_storage_key"]["firebase_storage_key"]
 
+
 # -----------------------------------------------------------------------
 
 # Return meta data dict
-
 
 def get_meta(vid):
     # -*- coding: utf-8 -*-
@@ -113,10 +113,10 @@ def _get_comments(vid):
 
     return comments
 
+
 # -----------------------------------------------------------------------
 
 # Return a list with reply data for a list of comments
-
 
 def _get_replies(comments):
     # Disable OAuthlib's HTTPS verification when running locally.
@@ -165,10 +165,10 @@ def _get_replies(comments):
 
     return replies
 
+
 # -----------------------------------------------------------------------
 
 # Return a df with filtered and stitched comment and reply data for a video id
-
 
 def get_content_raw(vid):
     # Get comments and replies data for video id
@@ -197,15 +197,3 @@ def get_content_raw(vid):
     df = pd.DataFrame(np.array(data), columns=["id", "content"])
 
     return df
-
-# -----------------------------------------------------------------------
-
-# Testing
-
-
-def main():
-    return
-
-
-if __name__ == '__main__':
-    main()

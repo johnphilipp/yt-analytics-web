@@ -1,17 +1,19 @@
+import streamlit as st
+from components import header
 from utils import app
 from utils import sb
-from components.analysis import sentiment
-from components.analysis import wcloud
-from components.analysis import topflop
+from components.analytics import sentiment
+from components.analytics import wcloud
+from components.analytics import topflop
 import streamlit as st
 from streamlit_option_menu import option_menu
 
 
 # -----------------------------------------------------------------------
 
-# Helper Func -- Edit tile
+# Edit tile
 
-def _display_edit(video_id, meta):
+def _edit(video_id, meta):
     car_info = sb.get_car_from_video_id(video_id)
     col1, col2, col3, col4, col5 = st.columns([0.6, 3.2, 1.2, 1.2, 1.2])
     selected_remove = col1.button('-', key=video_id + "_remove")
@@ -27,23 +29,18 @@ def _display_edit(video_id, meta):
     col4.text(app.human_format(int(meta["view_count"])) + " views")
     col5.text(app.human_format(int(meta["comment_count"])) + " comments")
 
-
 # -----------------------------------------------------------------------
 
-# Main func -- View Analysis
+# View Analysis
+
 
 def view_analysis():
     if len(st.session_state['video_ids_selected']) > 0:
-        st.markdown("---")
-        app.space(2)
-        st.subheader("View Analysis 📊")
-        app.space(2)
-
         if len(st.session_state['video_ids_selected']) > 0:
             with st.expander("Edit Selection"):
                 app.space(1)
                 for video_id in st.session_state['video_ids_selected']:
-                    _display_edit(video_id, sb.get_meta(video_id))
+                    _edit(video_id, sb.get_meta(video_id))
         app.space(1)
 
         menu = option_menu(None, ["Sentiment", "Wordcloud", "Top/Flop"],
@@ -58,3 +55,17 @@ def view_analysis():
 
         elif menu == "Top/Flop":
             topflop.get_topflop()
+
+
+def run():
+    header.display()
+    if "video_ids_selected" not in st.session_state:
+        st.session_state["video_ids_selected"] = []
+    if st.session_state["video_ids_selected"]:
+        view_analysis()
+    else:
+        st.warning("Please select a Car and Video to get started")
+
+
+if __name__ == "__main__":
+    run()

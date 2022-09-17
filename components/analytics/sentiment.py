@@ -11,8 +11,7 @@ import plotly.express as px
 
 # -----------------------------------------------------------------------
 
-# Helper func -- Generatenmb and display sentiment radar chart
-
+# Generate and display sentiment radar chart
 
 def _get_radar_chart(df):
     fig = px.line_polar(df,
@@ -42,7 +41,7 @@ def _get_radar_chart(df):
 
 # -----------------------------------------------------------------------
 
-# Main func -- Get sentiment
+# Get sentiment
 
 def get_sentiment():
     def get_feature_stats():

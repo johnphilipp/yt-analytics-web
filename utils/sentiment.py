@@ -3,10 +3,10 @@ import torch
 from textblob import TextBlob
 import pandas as pd
 
+
 # -----------------------------------------------------------------------
 
 # Return a df with sentiment score based on transformers
-
 
 def sentiment_transformers(df):
     # Initiate model
@@ -27,11 +27,11 @@ def sentiment_transformers(df):
 
     return df
 
+
 # -----------------------------------------------------------------------
 
 # Return a df with sentiment score (subjectivity and polarity) based on
 # textblob
-
 
 def sentiment_textblob(df):
     # Create func to get subjectivity

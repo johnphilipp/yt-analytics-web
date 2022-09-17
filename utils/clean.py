@@ -4,11 +4,11 @@ import nltk
 from nltk.corpus import stopwords
 import pandas as pd
 
+
 # -----------------------------------------------------------------------
 
 # Return a df with cleaned content (remove @abc mentions, links, and
 # punctuation)
-
 
 def basic_clean(df):
     # Creating function to clean comments
@@ -24,10 +24,10 @@ def basic_clean(df):
 
     return df
 
+
 # -----------------------------------------------------------------------
 
 # Return a df where stopwords are removed from content
-
 
 def remove_stopwords(df):
     # Download and select stopwords

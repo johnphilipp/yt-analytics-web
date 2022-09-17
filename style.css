@@ -4,17 +4,12 @@ body {
 }
 
 .stButton > button {
-  background-color: #487eb0;
-  color: #f5f6fa;
   border-radius: 5px;
   height: 3em;
   width: 100%;
 }
 
 .stButton > button:hover {
-  background-color: #40739e;
-  color: #f5f6fa;
-  border-color: #40739e;
   border-radius: 5px;
   height: 3em;
   width: 100%;

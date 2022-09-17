@@ -17,7 +17,7 @@ import spacy
 
 # -----------------------------------------------------------------------
 
-# Helper func -- Returns df of a single feature
+# Returns df of a single feature
 
 def _get_single_feature(df, feature):
     df = df[df["content"].notnull()]
@@ -30,7 +30,7 @@ def _get_single_feature(df, feature):
 
 # -----------------------------------------------------------------------
 
-# Helper func -- Returns df with only adjectives in content
+# Returns df with only adjectives in content
 
 def _get_adj(df):
     nlp = spacy.load("en_core_web_md")
@@ -43,28 +43,25 @@ def _get_adj(df):
 
 # -----------------------------------------------------------------------
 
-# Helper func -- Generate and display wordcloud
+# Generate and display wordcloud
 
 
-def _get_wordcloud(df):
+def _generate_wordcloud(df):
     df = clean.basic_clean(df)
     df = clean.remove_stopwords(df)
     all_words = " ".join([w for w in df["content_no_stopwords"]])
-    wordcloud = WordCloud(width=500, height=300, random_state=21,
-                          max_font_size=119).generate(all_words)
-
+    wordcloud = WordCloud(width=900, height=500, random_state=21,
+                          max_font_size=120).generate(all_words)
+    fig = plt.figure()
     plt.imshow(wordcloud, interpolation="bilinear")
     plt.axis("off")
-
-    img_buf = io.BytesIO()
-    plt.savefig(img_buf, format="jpg")
-
-    st.image(img_buf)
+    plt.show()
+    st.pyplot(fig)
 
 
 # -----------------------------------------------------------------------
 
-# Main func -- Generate and display wordcloud
+# Generate and display wordcloud
 
 def get_wordcloud():
     # Display selectbox for car/video
@@ -92,4 +89,4 @@ def get_wordcloud():
         st.write(
             "This feature is not mentioned. Please try using a different feature.")
     else:
-        _get_wordcloud(df_feature_adj)
+        _generate_wordcloud(df_feature_adj)
