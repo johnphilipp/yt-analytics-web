@@ -6,6 +6,7 @@ import pandas as pd
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import re
+import en_core_web_sm
 import spacy
 
 #
@@ -32,7 +33,6 @@ def _get_single_feature(df, feature):
 # Returns df with only adjectives in content
 
 def _get_adj(df):
-    import en_core_web_sm
     nlp = en_core_web_sm.load()
     # nlp = spacy.load("en_core_web_md")
 
