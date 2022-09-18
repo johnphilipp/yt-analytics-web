@@ -36,11 +36,11 @@ def _edit(video_id, meta):
 
 def view_analysis():
     if len(st.session_state['video_ids_selected']) > 0:
-        if len(st.session_state['video_ids_selected']) > 0:
-            with st.expander("Edit selection 🚗"):
-                app.space(1)
-                for video_id in st.session_state['video_ids_selected']:
-                    _edit(video_id, sb.get_meta(video_id))
+        with st.expander("Edit selection 🚗"):
+            app.space(1)
+            # TODO: Cache using st.session_state['video_ids_selected']
+            for video_id in st.session_state['video_ids_selected']:
+                _edit(video_id, sb.get_meta(video_id))
         app.space(1)
 
         menu = option_menu(None, ["Sentiment", "Wordcloud", "Top/Flop"],
@@ -48,12 +48,15 @@ def view_analysis():
                            menu_icon="cast", default_index=0, orientation="horizontal")
 
         if menu == "Sentiment":
+            # TODO: Cache using st.session_state['video_ids_selected']
             sentiment.get_sentiment()
 
         elif menu == "Wordcloud":
+            # TODO: Cache using st.session_state['video_ids_selected']
             wcloud.get_wordcloud()
 
         elif menu == "Top/Flop":
+            # TODO: Cache using st.session_state['video_ids_selected']
             topflop.get_topflop()
 
 

@@ -33,8 +33,9 @@ def _get_single_feature(df, feature):
 # Returns df with only adjectives in content
 
 def _get_adj(df):
-    nlp = en_core_web_sm.load()
-    # nlp = spacy.load("en_core_web_md")
+    if "nlp" not in st.session_state:
+        st.session_state["nlp"] = en_core_web_sm.load()
+    nlp = st.session_state["nlp"]
 
     def _filter_adj_spacy(comment):
         comment = nlp(comment)
@@ -56,7 +57,6 @@ def _generate_wordcloud(df):
     fig = plt.figure()
     plt.imshow(wordcloud, interpolation="bilinear")
     plt.axis("off")
-    plt.show()
     st.pyplot(fig)
 
 

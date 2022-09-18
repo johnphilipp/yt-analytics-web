@@ -2,7 +2,7 @@ from string import punctuation
 import re
 import nltk
 from nltk.corpus import stopwords
-import pandas as pd
+import streamlit as st
 
 
 # -----------------------------------------------------------------------
@@ -30,8 +30,11 @@ def basic_clean(df):
 # Return a df where stopwords are removed from content
 
 def remove_stopwords(df):
-    # Download and select stopwords
-    nltk.download('stopwords')
+    @st.cache(suppress_st_warning=True)
+    def _download_nltk_stopwords():
+        nltk.download("stopwords")
+
+    _download_nltk_stopwords()
     english_stop_words = stopwords.words('english')
 
     # Func which removes stopwords
