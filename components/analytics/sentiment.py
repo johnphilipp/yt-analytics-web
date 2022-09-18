@@ -41,29 +41,47 @@ def _get_radar_chart(df):
 
 # -----------------------------------------------------------------------
 
-# Get sentiment
+# Get sentiment data
 
-def get_sentiment():
-    def get_feature_stats():
+def _get_sentiment_data(video_ids_selected, occurrence_cutoff):
+    @st.cache(suppress_st_warning=True)
+    def _get_feature_stats(video_ids_selected):
         feature_stats = pd.DataFrame(
             columns=["feature", "comment_count", "sentiment_mean", "car"])
-        for video_id in st.session_state['video_ids_selected']:
+        for video_id in video_ids_selected:
             current = sb.get_feature_stats(video_id)
             current['car'] = app.get_car_info(video_id)
             feature_stats = pd.concat(
                 [feature_stats, current]).sort_values(by=["feature", "car"])
             feature_stats.insert(0, 'car', feature_stats.pop('car'))
         return feature_stats
+    feature_stats = _get_feature_stats(video_ids_selected)
 
-    feature_stats = get_feature_stats()
-    feature_stats = feature_stats[feature_stats.groupby(
-        'feature')['feature'].transform('size') > (len(st.session_state['video_ids_selected']) - 1)]
+    @st.cache(suppress_st_warning=True)
+    def _rm_occurrence_cutoff(feature_stats, occurrence_cutoff):
+        return feature_stats.drop(feature_stats[feature_stats["comment_count"] < occurrence_cutoff].index)
+    feature_stats = _rm_occurrence_cutoff(feature_stats, occurrence_cutoff)
 
-    # Display radar chart
-    _get_radar_chart(feature_stats)
+    @st.cache(suppress_st_warning=True)
+    def _rm_uncommon_features(feature_stats):
+        return feature_stats[feature_stats.groupby(
+            'feature')['feature'].transform('size') > (len(video_ids_selected) - 1)]
+    feature_stats = _rm_uncommon_features(feature_stats)
+
+    print(feature_stats)
+    return feature_stats
 
     # # Display features that are in merged set
     # all_features = feature_stats["feature"].unique().tolist()
     # st.multiselect("Edit features to visualize",
     #                all_features, all_features)
     # app.space(1)
+
+
+# -----------------------------------------------------------------------
+
+# Build plot
+
+def get_sentiment_radar(video_ids_selected, occurrence_cutoff):
+    sentiment_data = _get_sentiment_data(video_ids_selected, occurrence_cutoff)
+    _get_radar_chart(sentiment_data)

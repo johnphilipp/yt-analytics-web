@@ -29,10 +29,10 @@ def _edit(video_id, meta):
     col4.text(app.human_format(int(meta["view_count"])) + " views")
     col5.text(app.human_format(int(meta["comment_count"])) + " comments")
 
+
 # -----------------------------------------------------------------------
 
 # View Analysis
-
 
 def view_analysis():
     if len(st.session_state['video_ids_selected']) > 0:
@@ -48,8 +48,10 @@ def view_analysis():
                            menu_icon="cast", default_index=0, orientation="horizontal")
 
         if menu == "Sentiment":
-            # TODO: Cache using st.session_state['video_ids_selected']
-            sentiment.get_sentiment()
+            occurrence_cutoff = st.slider(
+                "Select minimum munber of feature occurrences", 1, 30, key="occurrence_cutoff")
+            sentiment.get_sentiment_radar(
+                st.session_state['video_ids_selected'], occurrence_cutoff)
 
         elif menu == "Wordcloud":
             # TODO: Cache using st.session_state['video_ids_selected']
