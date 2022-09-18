@@ -6,6 +6,7 @@ components/header/__pycache__/
 components/request/__pycache__/
 components/select/__pycache__/
 utils/__pycache__/
+pages/_2_Analytics_View_2.py
 .code-workspace
 .DS_Store
 .streamlit

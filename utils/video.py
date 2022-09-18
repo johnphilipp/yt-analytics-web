@@ -7,11 +7,11 @@ from utils import clean
 from utils import sentiment
 
 
-# -----------------------------------------------------------------------
-
-# Extract video data from YouTube, Transform, Load into Supabase
-
 class Video:
+    """
+    Extract video data from YouTube, Transform, Load into Supabase
+    """
+
     def __init__(self, make, model, trim, year, url):
         self._make = make
         self._model = model
@@ -108,11 +108,10 @@ class Video:
         return sb.insert_sentiment(self._video_id, sentiment)
 
 
-# -----------------------------------------------------------------------
-
-# Testing
-
 def main():
+    """
+    Testing
+    """
     input = [
         ["Make", "Model", "Trim", "Year", "Url"]
     ]

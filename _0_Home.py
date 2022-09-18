@@ -1,11 +1,12 @@
 import streamlit as st
-from streamlit.logger import get_logger
 from utils import app
 from components import form
 from components import header
 
-LOGGER = get_logger(__name__)
 
+# -----------------------------------------------------------------------
+
+# Display landing page
 
 def _landing_page():
     col1, col2 = st.columns([1, 2.5])
@@ -18,10 +19,18 @@ def _landing_page():
     col2.image("https://p-john.com/wp-content/uploads/2022/09/wallpaper.png")
 
 
+# -----------------------------------------------------------------------
+
+# Display form
+
 def _form():
     st.write("## Select a car to get started 🚗")
     form.display()
 
+
+# -----------------------------------------------------------------------
+
+# Display value prop
 
 def _value_prop():
     col1, col2, col3 = st.columns([1, 1, 1])
@@ -49,6 +58,10 @@ def _value_prop():
         Benchmark against your competition
         </h3>""", unsafe_allow_html=True)
 
+
+# -----------------------------------------------------------------------
+
+# Run
 
 def run():
     st.set_page_config(layout="centered", page_icon="📊",

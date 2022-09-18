@@ -3,11 +3,10 @@ from components import header
 from utils import app
 
 
-# -----------------------------------------------------------------------
-
-# Request car/video to be added to app
-
 def request():
+    """
+    Request car/video to be added to app
+    """
     st.warning("Not yet functional")
     with st.form(key='my_form'):
         st.write("Request to add a new Car/Video")
@@ -27,10 +26,6 @@ def request():
                 st.warning(
                     "Form is not ready to be submitted. All fields need to be filled out.")
 
-
-# -----------------------------------------------------------------------
-
-# Run
 
 def run():
     header.display()

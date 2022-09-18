@@ -4,16 +4,11 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-#
-# TODO: Add slider to select how many comments minimum (default 5)
-#
-
-
-# -----------------------------------------------------------------------
-
-# Generate and display sentiment radar chart
 
 def _get_radar_chart(df):
+    """
+    Return sentiment radar chart as fig
+    """
     fig = px.line_polar(df,
                         r='sentiment_mean',
                         theta='feature',
@@ -36,14 +31,13 @@ def _get_radar_chart(df):
         xanchor="right",
         x=1
     ))
-    st.plotly_chart(fig, use_container_width=True)
+    return fig
 
-
-# -----------------------------------------------------------------------
-
-# Get sentiment data
 
 def _get_sentiment_data(video_ids_selected, occurrence_cutoff):
+    """
+    Return sentiment data
+    """
     @st.cache(suppress_st_warning=True)
     def _get_feature_stats(video_ids_selected):
         feature_stats = pd.DataFrame(
@@ -68,7 +62,6 @@ def _get_sentiment_data(video_ids_selected, occurrence_cutoff):
             'feature')['feature'].transform('size') > (len(video_ids_selected) - 1)]
     feature_stats = _rm_uncommon_features(feature_stats)
 
-    print(feature_stats)
     return feature_stats
 
     # # Display features that are in merged set
@@ -78,10 +71,9 @@ def _get_sentiment_data(video_ids_selected, occurrence_cutoff):
     # app.space(1)
 
 
-# -----------------------------------------------------------------------
-
-# Build plot
-
 def get_sentiment_radar(video_ids_selected, occurrence_cutoff):
+    """
+    Display sentiment radar chart 
+    """
     sentiment_data = _get_sentiment_data(video_ids_selected, occurrence_cutoff)
-    _get_radar_chart(sentiment_data)
+    st.plotly_chart(_get_radar_chart(sentiment_data), use_container_width=True)

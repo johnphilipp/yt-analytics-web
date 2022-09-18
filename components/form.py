@@ -34,18 +34,17 @@ from streamlit.components.v1 import html
 #     html(nav_script)
 
 
-# -----------------------------------------------------------------------
-
-# Get `available_video_ids` from current user selection in form
-
-# If `count=True`, function returns # of `available_video_ids`
-# This is called to update the form-button text which previews the #
-
-# If `count=False`, function returns `array` with `available_video_ids`
-# This is called to update the state `available_video_ids`, which is used
-# to the display catalogue in `_1_Select.py`
-
 def _get_video_ids(make, model, trim, year, form_previews, count=False):
+    """
+    Get `available_video_ids` from current user selection in form
+
+    If `count=True`, function returns # of `available_video_ids`
+    This is called to update the form-button text which previews the #
+
+    If `count=False`, function returns `array` with `available_video_ids`
+    This is called to update the state `available_video_ids`, which is used
+    to the display catalogue in `_1_Select.py`
+    """
     car_ids = sb.get_car_id(make, model, trim, year, form_previews)
     available_video_ids = []
     if (isinstance(car_ids, int)):
@@ -60,11 +59,10 @@ def _get_video_ids(make, model, trim, year, form_previews, count=False):
     return available_video_ids
 
 
-# -----------------------------------------------------------------------
-
-# Display form
-
 def display():
+    """
+    Display form
+    """
     preview = {"make": "Any make", "model": "Any model",
                "trim": "Any trim", "year": "Any year"}
 
