@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_extras.switch_page_button import switch_page
 from components import header
 from components import form
 from utils import app
@@ -41,7 +42,7 @@ def _catalogue(meta):
                 st.session_state["video_ids_selected"] = []
             if (meta["video_id"] not in st.session_state["video_ids_selected"]):
                 st.session_state["video_ids_selected"].append(meta["video_id"])
-            # TODO: Switch page
+            switch_page("analytics")
 
     for i in range(0, len(meta)):
         _catalogue_tile(meta[i])

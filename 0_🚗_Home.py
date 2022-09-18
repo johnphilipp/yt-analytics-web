@@ -4,11 +4,10 @@ from components import form
 from components import header
 
 
-# -----------------------------------------------------------------------
-
-# Display landing page
-
 def _landing_page():
+    """
+    Display landing page
+    """
     col1, col2 = st.columns([1, 2.5])
 
     col1.write("##")
@@ -19,20 +18,18 @@ def _landing_page():
     col2.image("https://p-john.com/wp-content/uploads/2022/09/wallpaper.png")
 
 
-# -----------------------------------------------------------------------
-
-# Display form
-
 def _form():
+    """
+    Display form
+    """
     st.write("## Select a car to get started 🚗")
-    form.display()
+    form.display(select_page=False)
 
-
-# -----------------------------------------------------------------------
-
-# Display value prop
 
 def _value_prop():
+    """
+    Display value prop
+    """
     col1, col2, col3 = st.columns([1, 1, 1])
 
     col1.markdown("""<p style="text-align: center; font-size: 50px;">💡</p>""",
@@ -58,10 +55,6 @@ def _value_prop():
         Benchmark against your competition
         </h3>""", unsafe_allow_html=True)
 
-
-# -----------------------------------------------------------------------
-
-# Run
 
 def run():
     st.set_page_config(layout="centered", page_icon="📊",

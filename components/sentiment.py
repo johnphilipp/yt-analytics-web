@@ -5,7 +5,8 @@ import pandas as pd
 import plotly.express as px
 
 
-def _get_radar_chart(df):
+@st.cache(suppress_st_warning=True)
+def get_radar_chart(df):
     """
     Return sentiment radar chart as fig
     """
@@ -34,11 +35,11 @@ def _get_radar_chart(df):
     return fig
 
 
-def _get_sentiment_data(video_ids_selected, occurrence_cutoff):
+@st.cache(suppress_st_warning=True)
+def get_sentiment_data(video_ids_selected, occurrence_cutoff):
     """
     Return sentiment data
     """
-    @st.cache(suppress_st_warning=True)
     def _get_feature_stats(video_ids_selected):
         feature_stats = pd.DataFrame(
             columns=["feature", "comment_count", "sentiment_mean", "car"])
@@ -51,12 +52,10 @@ def _get_sentiment_data(video_ids_selected, occurrence_cutoff):
         return feature_stats
     feature_stats = _get_feature_stats(video_ids_selected)
 
-    @st.cache(suppress_st_warning=True)
     def _rm_occurrence_cutoff(feature_stats, occurrence_cutoff):
         return feature_stats.drop(feature_stats[feature_stats["comment_count"] < occurrence_cutoff].index)
     feature_stats = _rm_occurrence_cutoff(feature_stats, occurrence_cutoff)
 
-    @st.cache(suppress_st_warning=True)
     def _rm_uncommon_features(feature_stats):
         return feature_stats[feature_stats.groupby(
             'feature')['feature'].transform('size') > (len(video_ids_selected) - 1)]
@@ -69,11 +68,3 @@ def _get_sentiment_data(video_ids_selected, occurrence_cutoff):
     # st.multiselect("Edit features to visualize",
     #                all_features, all_features)
     # app.space(1)
-
-
-def get_sentiment_radar(video_ids_selected, occurrence_cutoff):
-    """
-    Display sentiment radar chart 
-    """
-    sentiment_data = _get_sentiment_data(video_ids_selected, occurrence_cutoff)
-    st.plotly_chart(_get_radar_chart(sentiment_data), use_container_width=True)
