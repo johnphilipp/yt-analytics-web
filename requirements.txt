@@ -7,7 +7,6 @@ plotly==5.8.2
 spacy==3.4.0
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.4.0/en_core_web_sm-3.4.0.tar.gz#egg=en_core_web_sm
 streamlit==1.12.2
-streamlit_extras==0.0.8
 streamlit_option_menu==0.3.2
 supabase==0.5.8
 textblob==0.17.1

@@ -1,6 +1,5 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from streamlit_extras.switch_page_button import switch_page
 import pandas as pd
 import re
 from components import header
@@ -8,6 +7,7 @@ from components import sentiment
 from components import wcloud
 from utils import app
 from utils import sb
+from utils import switch_page
 
 
 def _display_sentiment(sentiment_data):
@@ -167,7 +167,7 @@ def _display_edit_box():
                 _edit_tile(video_id, sb.get_meta(video_id))
             app.space(1)
             if st.button("Add another car to anaysis"):
-                switch_page("select")
+                switch_page.run("select")
         app.space(1)
 
 
