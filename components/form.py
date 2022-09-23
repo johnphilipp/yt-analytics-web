@@ -1,7 +1,7 @@
 import streamlit as st
 from utils import app
 from utils import sb
-from streamlit_extras.switch_page_button import switch_page
+from utils import switch_page
 
 
 def _get_video_ids(make, model, trim, year, form_previews, count=False):
@@ -83,4 +83,4 @@ def display(select_page=True):
             st.session_state["available_video_ids"] = _get_video_ids(
                 make, model, trim, year, preview)
             if not select_page:
-                switch_page("select")
+                switch_page.run("select")
