@@ -112,10 +112,6 @@ def get_feature_stats(video_id):
     df = pd.DataFrame(data.data)
 
     def _get_features(df, feature_list):
-        # Remove NaNs
-        df = df[df["content"].notnull()]
-
-        # Func which returns df of a single feature
         def _get_single_feature(df, feature):
             df_single_feature = pd.DataFrame()
             df_single_feature = pd.concat(
@@ -123,7 +119,7 @@ def get_feature_stats(video_id):
             df_single_feature["feature"] = feature
             return df_single_feature
 
-        # Stitch df_single_feature together into df_features
+        df = df[df["content"].notnull()]
         df_features = pd.DataFrame()
         for feature in feature_list:
             df_features = pd.concat(
@@ -214,16 +210,3 @@ def get_car_from_video_id(video_id):
     data = supabase.table("CAR").select(
         "*").eq("car_id", data.data[0]["car_id"]).execute()
     return data.data[0]
-
-
-def main():
-    # print(get_feature_stats("mHhZ9jk-DrU"))
-    # print(get_makes())
-    # print(get_models("Polestar"))
-    # print(get_meta("mHhZ9jk-DrU"))
-    # print(get_car_from_video_id("mHhZ9jk-DrU"))
-    print(get_content("mHhZ9jk-DrU"))
-
-
-if __name__ == '__main__':
-    main()

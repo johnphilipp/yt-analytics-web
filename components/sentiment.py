@@ -62,9 +62,3 @@ def get_sentiment_data(video_ids_selected, occurrence_cutoff):
     feature_stats = _rm_uncommon_features(feature_stats)
 
     return feature_stats
-
-    # # Display features that are in merged set
-    # all_features = feature_stats["feature"].unique().tolist()
-    # st.multiselect("Edit features to visualize",
-    #                all_features, all_features)
-    # app.space(1)

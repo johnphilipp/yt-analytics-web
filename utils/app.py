@@ -19,11 +19,6 @@ def get_car_info(video_id):
     car_info_string = car_info["make"] + " " + \
         car_info["model"] + " (" + \
         video_id + ")"
-    # car_info_string = car_info["make"] + " " + \
-    #     car_info["model"] + " " + \
-    #     car_info["trim"] + " " + \
-    #     str(car_info["year"]) + " (" + \
-    #     video_id + ")"
     return car_info_string
 
 

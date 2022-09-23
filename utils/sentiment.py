@@ -4,11 +4,10 @@ from textblob import TextBlob
 import pandas as pd
 
 
-# -----------------------------------------------------------------------
-
-# Return a df with sentiment score based on transformers
-
 def sentiment_transformers(df):
+    """
+    Return a df with sentiment score based on transformers
+    """
     tokenizer = AutoTokenizer.from_pretrained(
         'nlptown/bert-base-multilingual-uncased-sentiment')
     model = AutoModelForSequenceClassification.from_pretrained(
