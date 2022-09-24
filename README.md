@@ -1,5 +1,7 @@
 # Senty 📊 🚗 💬
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/johnphilipp/yt-analytics-web/0_🚗_Home.py/)
+
 ## What?
 
 - Automotive market intelligence via social media analytics
