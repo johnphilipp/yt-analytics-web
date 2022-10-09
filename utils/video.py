@@ -1,10 +1,10 @@
 import sys
 import os
 from pathlib import Path
-from utils import yt
-from utils import sb
-from utils import clean
-from utils import sentiment
+import utils.sb as sb
+import utils.yt as yt
+import utils.clean as clean
+import utils.sentiment as sentiment
 
 
 class Video:
@@ -85,7 +85,7 @@ class Video:
 
     def get_car_id(self):
         """
-        Return car_id of a car from Supabase speciefied by Make, Model, Trim, Year.
+        Return car_id of a car from Supabase specified by Make, Model, Trim, Year.
         """
         return sb.get_car_id(self._make, self._model, self._trim, self._year)
 
@@ -95,17 +95,17 @@ class Video:
         """
         return sb.insert_meta(self._video_id, car_id, meta)
 
-    def post_content_supabase(self, content):
+    def post_content_supabase(self, car_id, content):
         """
         Post content data to Supabase.
         """
-        return sb.insert_content(self._video_id, content)
+        return sb.insert_content(self._video_id, car_id, content)
 
-    def post_sentiment_supabase(self, sentiment):
+    def post_sentiment_supabase(self, car_id, sentiment):
         """
         Post sentiment data to Supabase.
         """
-        return sb.insert_sentiment(self._video_id, sentiment)
+        return sb.insert_sentiment(self._video_id, car_id, sentiment)
 
 
 def main():

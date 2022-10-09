@@ -4,7 +4,31 @@ from utils import sb
 from utils import switch_page
 
 
-def _get_video_ids(make, model, trim, year, form_previews, count=False):
+def _get_previews():
+    """
+    Return dict with previews for form preview values
+    """
+    return {"make": "Any make", "model": "Any model", "trim": "Any trim", "year": "Any year"}
+
+
+def get_car_ids(make, model, form_previews, trim="", year=""):
+    return sb.get_car_id(make, model, trim, year, form_previews)
+
+
+def get_available_video_ids(make, model, trim, year, form_previews):
+    car_ids = sb.get_car_id(make, model, trim, year, form_previews)
+    available_video_ids = []
+    if (isinstance(car_ids, int)):
+        for video_id in sb.get_video_ids_for_car_id(car_ids):
+            available_video_ids.append(video_id)
+    else:
+        for car_id in car_ids:
+            for video_id in sb.get_video_ids_for_car_id(car_id):
+                available_video_ids.append(video_id)
+    return available_video_ids
+
+
+def get_num_comments_for_car_id(make, model, trim, year, form_previews):
     """
     Get `available_video_ids` from current user selection in form
 
@@ -16,25 +40,33 @@ def _get_video_ids(make, model, trim, year, form_previews, count=False):
     to the display catalogue in `_1_Select.py`
     """
     car_ids = sb.get_car_id(make, model, trim, year, form_previews)
-    available_video_ids = []
-    if (isinstance(car_ids, int)):
-        for video_id in sb.get_video_ids_for_car_id(car_ids):
-            available_video_ids.append(video_id)
+    num_comments = 0
+    if isinstance(car_ids, int):
+        car_id = car_ids
+        num_comments += sb.get_num_comments_for_car_id(car_id)
     else:
         for car_id in car_ids:
-            for video_id in sb.get_video_ids_for_car_id(car_id):
-                available_video_ids.append(video_id)
-    if (count):
-        return str(len(available_video_ids))
-    return available_video_ids
+            num_comments += sb.get_num_comments_for_car_id(car_id)
+    return app.human_format(num_comments)
 
 
-def display(select_page=True):
+def get_button_num_comments(make, model, preview, trim="", year="", previews=_get_previews()):
+    """
+    Return number of comments based on current selection as string for button
+    """
+    if (make != "" and make != previews["make"]):
+        num_videos = get_num_comments_for_car_id(
+            make, model, trim, year, preview)
+    else:
+        num_videos = ""
+    return num_videos
+
+
+def setup(select_page=True):
     """
     Display form
     """
-    preview = {"make": "Any make", "model": "Any model",
-               "trim": "Any trim", "year": "Any year"}
+    preview = _get_previews
 
     if "car_selected" not in st.session_state:
         st.session_state["car_selected"] = {
@@ -48,39 +80,36 @@ def display(select_page=True):
         col1, col2 = st.columns(2)
         col3, col4 = st.columns(2)
 
-        form_previews = {"make": "Any make", "model": "Any model",
-                         "trim": "Any trim", "year": "Any year"}
+        previews = {"make": "Any make", "model": "Any model",
+                    "trim": "Any trim", "year": "Any year"}
 
         makes = sb.get_makes()
-        makes.insert(0, form_previews["make"])
+        makes.insert(0, previews["make"])
         make = col1.selectbox("Make", makes, key="make_selected")
 
         models = sb.get_models(make)
-        models.insert(0, form_previews["model"])
+        models.insert(0, previews["model"])
         model = col2.selectbox("Model", models)
 
         trims = sb.get_trim(make, model)
-        trims.insert(0, form_previews["trim"])
+        trims.insert(0, previews["trim"])
         trim = col3.selectbox("Trim", trims)
 
         years = sb.get_year(make, model, trim)
-        years.insert(0, form_previews["year"])
+        years.insert(0, previews["year"])
         year = col4.selectbox("Year", years)
         app.space(1)
 
-    if (make != "" and make != form_previews["make"]):
-        num_videos = _get_video_ids(make, model, trim, year, preview, True)
-    else:
-        num_videos = ""
-    button = st.button("See all {} videos".format(num_videos))
-
     app.space(1)
 
+    button = st.button("See all {} videos".format(
+        get_button_num_comments(make, model, trim, year, preview)))
+
     if button:
-        if (make == "" or make == form_previews["make"]):
+        if (make == "" or make == previews["make"]):
             st.warning("Please select a Make")
         else:
-            st.session_state["available_video_ids"] = _get_video_ids(
+            st.session_state["available_video_ids"] = get_num_comments_for_car_id(
                 make, model, trim, year, preview)
             if not select_page:
-                switch_page.run("select")
+                switch_page.switch_page("select")

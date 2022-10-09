@@ -10,3 +10,4 @@ pages/_2_Analytics_View_2.py
 .code-workspace
 .DS_Store
 .streamlit
+data/

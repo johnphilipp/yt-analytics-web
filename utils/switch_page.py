@@ -2,7 +2,7 @@ from streamlit import _RerunData, _RerunException
 from streamlit.source_util import get_pages
 
 
-def run(page_name: str):
+def switch_page(page_name: str):
     """
     Switch streamlit page on button click
     """

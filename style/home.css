@@ -1,0 +1,46 @@
+body {
+  color: #fff;
+  background-color: #4f8bf9;
+  overflow: -moz-scrollbars-vertical;
+  padding-left: 30px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+@media screen and (max-width: 640px) {
+  .css-ocqkz7.e1tzin5v4 {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+  [data-baseweb='select'] {
+    width: 100%;
+  }
+}
+
+[data-baseweb='select'] {
+  margin-top: -50px;
+}
+
+.css-1q8dd3e.edgvbvh9 {
+  margin-top: 6px;
+}
+
+.stButton > button {
+  border-radius: 5px;
+  height: 3em;
+  width: 100%;
+}
+
+.stButton > button:hover {
+  border-radius: 5px;
+  height: 3em;
+  width: 100%;
+}
+
+.main.css-k1vhr4.egzxvld3 {
+  padding-left: 20px;
+}
+
+/* .appview-container .main .block-container {
+  max-width: 800px;
+} */

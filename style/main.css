@@ -1,6 +1,10 @@
 body {
   color: #fff;
   background-color: #4f8bf9;
+  overflow: -moz-scrollbars-vertical;
+  padding-left: 30px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .stButton > button {
@@ -15,6 +19,6 @@ body {
   width: 100%;
 }
 
-.appview-container .main .block-container {
-  max-width: 1000px;
-}
+/* .appview-container .main .block-container {
+  max-width: 800px;
+} */
