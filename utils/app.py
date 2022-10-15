@@ -1,5 +1,5 @@
 import streamlit as st
-from utils import sb
+from database import db
 
 
 def get_defined_feature_list():
@@ -15,7 +15,7 @@ def get_car_info_from_car_id(car_id):
     """
     Get car info from car_id
     """
-    car_info = sb.get_car_from_car_id(car_id)
+    car_info = db.get_car_from_car_id(car_id)
     car_info_string = car_info["make"] + " " + car_info["model"]
     return car_info_string
 
@@ -24,7 +24,7 @@ def get_car_make(video_id):
     """
     Get car info from video_id
     """
-    car_info = sb.get_car_from_car_id(video_id)
+    car_info = db.get_car_from_car_id(video_id)
     car_info_string = car_info["make"]
     return car_info_string
 
@@ -33,7 +33,7 @@ def get_car_make_and_model_from_car_id(car_id):
     """
     Get car info from car_id
     """
-    car_info = sb.get_car_from_car_id(car_id)
+    car_info = db.get_car_from_car_id(car_id)
     car_info_string = car_info["make"] + " " + car_info["model"]
     return car_info_string
 

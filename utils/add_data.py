@@ -1,11 +1,13 @@
-from utils.video import Video
+from model.Video import Video
 import pandas as pd
+import streamlit as st
 
 
 def get_meta(video):
     """
     Get meta data via YouTube API
     """
+    st.spinner("1/6) Get meta data")
     return video.get_meta()
 
 
@@ -13,7 +15,8 @@ def get_content(video):
     """
     Get post and comment content via YouTube API
     """
-    return video.get_content_raw()
+    with st.spinner("2/6) Scrape content"):
+        return video.get_content_raw()
 
 
 def get_sentiment(video, content):
@@ -21,28 +24,32 @@ def get_sentiment(video, content):
     Get sentiment data calculated from content 
     via custom Transformers model
     """
-    return video.get_sentiment_transformers(content)
+    with st.spinner("3/6) Calculate sentiment"):
+        return video.get_sentiment_transformers(content)
 
 
 def post_meta(video, meta):
     """
     Post meta to Supabase
     """
-    video.post_meta_supabase(video.get_car_id(), meta)
+    with st.spinner("4/6) Push meta data to database"):
+        video.post_meta_supabase(video.get_car_id(), meta)
 
 
 def post_content(video, content):
     """
     Post content to Supabase
     """
-    video.post_content_supabase(video.get_car_id(), content)
+    with st.spinner("5/6) Push content to database"):
+        video.post_content_supabase(video.get_car_id(), content)
 
 
 def post_sentiment(video, sentiment):
     """
     Post sentiment to Supabase
     """
-    video.post_sentiment_supabase(video.get_car_id(), sentiment)
+    with st.spinner("6/6) Push sentiment to database"):
+        video.post_sentiment_supabase(video.get_car_id(), sentiment)
 
 
 def run():

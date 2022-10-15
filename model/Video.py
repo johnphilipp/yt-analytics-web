@@ -1,7 +1,7 @@
 import sys
 import os
 from pathlib import Path
-import utils.sb as sb
+import database.db as db
 import utils.yt as yt
 import utils.clean as clean
 import utils.sentiment as sentiment
@@ -18,9 +18,9 @@ class Video:
         self._trim = trim
         self._year = year
         self._url = url
-        self._video_id = self._parse_video_id(url)
+        self._video_id = self.parse_video_id(url)
 
-    def _parse_video_id(self, url):
+    def parse_video_id(self, url):
         """
         Get video id from video url
         """
@@ -87,25 +87,25 @@ class Video:
         """
         Return car_id of a car from Supabase specified by Make, Model, Trim, Year.
         """
-        return sb.get_car_id(self._make, self._model, self._trim, self._year)
+        return db.get_car_id(self._make, self._model, self._trim, self._year)
 
     def post_meta_supabase(self, car_id, meta):
         """
         Post meta data to Supabase.
         """
-        return sb.insert_meta(self._video_id, car_id, meta)
+        return db.insert_meta(self._video_id, car_id, meta)
 
     def post_content_supabase(self, car_id, content):
         """
         Post content data to Supabase.
         """
-        return sb.insert_content(self._video_id, car_id, content)
+        return db.insert_content(self._video_id, car_id, content)
 
     def post_sentiment_supabase(self, car_id, sentiment):
         """
         Post sentiment data to Supabase.
         """
-        return sb.insert_sentiment(self._video_id, car_id, sentiment)
+        return db.insert_sentiment(self._video_id, car_id, sentiment)
 
 
 def main():
@@ -118,27 +118,27 @@ def main():
 
     for i in range(1, len(input)):
         # for i in range(2, 3):
-        video = Video(input[i][0], input[i][1], input[i]
-                      [2], input[i][3], input[i][4])
+        source = Video(input[i][0], input[i][1], input[i]
+                       [2], input[i][3], input[i][4])
 
         # -----------------------------------------------------------------------
 
         # 1) Meta
         # 1.1) Get meta
-        print("\n1) Meta (" + video.get_video_id() + ")")
+        print("\n1) Meta (" + source.get_video_id() + ")")
         print("1.1) Get meta")
-        meta = video.get_meta()
+        meta = source.get_meta()
         # 1.2) Post meta
         print("1.2) Post meta")
-        video.post_meta_supabase(video.get_car_id(), meta)
+        source.post_meta_supabase(source.get_car_id(), meta)
 
         # -----------------------------------------------------------------------
 
         # 2) Content
         # 2.1) Get content
-        print("\n2) Content (" + video.get_video_id() + ")")
+        print("\n2) Content (" + source.get_video_id() + ")")
         print("2.1) Get content")
-        content = video.get_content_raw()
+        content = source.get_content_raw()
         # 2.2) Post content
         # print("2.2) Post content")
         # print(video.post_content_supabase(content))
@@ -147,12 +147,12 @@ def main():
 
         # 3) Sentiment
         # 3.1) Get sentiment
-        print("\n3) Sentiment (" + video.get_video_id() + ")")
+        print("\n3) Sentiment (" + source.get_video_id() + ")")
         print("3.1) Get sentiment")
-        sentiment = video.get_sentiment_transformers(content)
+        sentiment = source.get_sentiment_transformers(content)
         # 3.2) Post sentiment
         print("3.2) Post sentiment")
-        print(video.post_sentiment_supabase(sentiment))
+        print(source.post_sentiment_supabase(sentiment))
 
 
 if __name__ == '__main__':

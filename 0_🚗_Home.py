@@ -1,6 +1,6 @@
 import streamlit as st
 from utils import app
-from utils import sb
+from database import db
 from utils.switch_page import switch_page
 from components import header
 from components import form
@@ -34,39 +34,82 @@ def _landing_page():
             "year": previews["year"]
         }
 
-    makes = sb.get_makes()
+    makes = db.get_makes()
     makes.insert(0, previews["make"])
     make = col1.selectbox("Make", makes, key="make_selected")
 
     col1.markdown("###")
 
-    models = sb.get_models(make)
+    models = db.get_models(make)
     models.insert(0, previews["model"])
     model = col1.selectbox("Model", models)
 
     app.space(1)
 
-    button = col1.button("Analyze {} comments".format(
-        form.get_button_num_comments(make, model, previews)))
+    num_comments = app.human_format(
+        db.get_num_comments_for_make_and_model(make, model))
+    if num_comments == "0":
+        num_comments = ""
+    button = col1.button("Analyze {} comments".format(num_comments))
 
     if button:
-        if (make == "" or make == previews["make"]):
-            st.warning("Please select a Make")
-        else:
-            if "car_ids_selected" not in st.session_state:
-                st.session_state["car_ids_selected"] = []
-
-            selected_cars = form.get_car_ids(make, model, previews)
-            if isinstance(selected_cars, int):
-                car = selected_cars
-                if car not in st.session_state["car_ids_selected"]:
-                    st.session_state["car_ids_selected"].append(car)
-                    switch_page("analytics")
+        def button(make, model):
+            if (make == "" or make == previews["make"]):
+                st.warning("Please select a Make")
             else:
-                for car in selected_cars:
-                    if car not in st.session_state["car_ids_selected"]:
-                        st.session_state["car_ids_selected"].append(car)
-                        switch_page("analytics")
+                if model == previews["model"]:
+                    # potentially multiple models
+
+                    models = db.get_models_of_make(make)
+                    if make not in st.session_state["cars"]:
+                        st.session_state["cars"][make] = {}
+                    for model in models:
+                        if model not in st.session_state["cars"][make]:
+                            st.session_state["cars"][make][model] = {}
+
+                        car_ids = db.get_car_id_from_make_model(
+                            make, model)
+                        changes = False
+                        changes = True  # figure  out where this should go
+                        for car_id in car_ids:
+                            if car_id not in st.session_state["cars"][make][model]:
+                                changes = True
+                                st.session_state["cars"][make][model][car_id] = {
+                                }
+
+                                video_ids = db.get_video_ids_for_car_id(
+                                    car_id)
+                                for video_id in video_ids:
+                                    if video_id not in st.session_state["cars"][make][model][car_id]:
+                                        st.session_state["cars"][make][model][car_id][video_id] = db.get_comment_count_actual_for_video_id(
+                                            video_id)
+                else:
+                    if make not in st.session_state["cars"]:
+                        st.session_state["cars"][make] = {}
+                    if model not in st.session_state["cars"][make]:
+                        st.session_state["cars"][make][model] = {}
+
+                    car_ids = db.get_car_id_from_make_model(make, model)
+                    changes = False
+                    changes = True  # figure  out where this should go
+                    for car_id in car_ids:
+                        if car_id not in st.session_state["cars"][make][model]:
+                            changes = True
+                            st.session_state["cars"][make][model][car_id] = {
+                            }
+
+                            video_ids = db.get_video_ids_for_car_id(car_id)
+                            for video_id in video_ids:
+                                if video_id not in st.session_state["cars"][make][model][car_id]:
+                                    st.session_state["cars"][make][model][car_id][video_id] = db.get_comment_count_actual_for_video_id(
+                                        video_id)
+                print("CARS: ", st.session_state["cars"])
+                return changes
+
+        changes = button(make, model)
+
+        if changes:
+            switch_page("analytics")
 
     # ------------------------------------------------
 
@@ -117,6 +160,9 @@ def run():
 
     with open("style/home.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+    if "cars" not in st.session_state:
+        st.session_state["cars"] = {}
 
     _landing_page()
 

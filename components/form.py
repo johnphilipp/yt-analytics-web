@@ -1,6 +1,6 @@
 import streamlit as st
 from utils import app
-from utils import sb
+from database import db
 from utils import switch_page
 
 
@@ -12,18 +12,18 @@ def _get_previews():
 
 
 def get_car_ids(make, model, form_previews, trim="", year=""):
-    return sb.get_car_id(make, model, trim, year, form_previews)
+    return db.get_car_id(make, model, trim, year, form_previews)
 
 
 def get_available_video_ids(make, model, trim, year, form_previews):
-    car_ids = sb.get_car_id(make, model, trim, year, form_previews)
+    car_ids = db.get_car_id(make, model, trim, year, form_previews)
     available_video_ids = []
     if (isinstance(car_ids, int)):
-        for video_id in sb.get_video_ids_for_car_id(car_ids):
+        for video_id in db.get_video_ids_for_car_id(car_ids):
             available_video_ids.append(video_id)
     else:
         for car_id in car_ids:
-            for video_id in sb.get_video_ids_for_car_id(car_id):
+            for video_id in db.get_video_ids_for_car_id(car_id):
                 available_video_ids.append(video_id)
     return available_video_ids
 
@@ -39,27 +39,27 @@ def get_num_comments_for_car_id(make, model, trim, year, form_previews):
     This is called to update the state `available_video_ids`, which is used
     to the display catalogue in `_1_Select.py`
     """
-    car_ids = sb.get_car_id(make, model, trim, year, form_previews)
+    car_ids = db.get_car_id(make, model, trim, year, form_previews)
     num_comments = 0
     if isinstance(car_ids, int):
         car_id = car_ids
-        num_comments += sb.get_num_comments_for_car_id(car_id)
+        num_comments += db.get_num_comments_for_car_id(car_id)
     else:
         for car_id in car_ids:
-            num_comments += sb.get_num_comments_for_car_id(car_id)
+            num_comments += db.get_num_comments_for_car_id(car_id)
     return app.human_format(num_comments)
 
 
 def get_button_num_comments(make, model, preview, trim="", year="", previews=_get_previews()):
     """
-    Return number of comments based on current selection as string for button
+    Return number of comments based on current selection
     """
     if (make != "" and make != previews["make"]):
-        num_videos = get_num_comments_for_car_id(
+        num_comments = get_num_comments_for_car_id(
             make, model, trim, year, preview)
     else:
-        num_videos = ""
-    return num_videos
+        num_comments = ""
+    return num_comments
 
 
 def setup(select_page=True):
@@ -83,19 +83,19 @@ def setup(select_page=True):
         previews = {"make": "Any make", "model": "Any model",
                     "trim": "Any trim", "year": "Any year"}
 
-        makes = sb.get_makes()
+        makes = db.get_makes()
         makes.insert(0, previews["make"])
         make = col1.selectbox("Make", makes, key="make_selected")
 
-        models = sb.get_models(make)
+        models = db.get_models(make)
         models.insert(0, previews["model"])
         model = col2.selectbox("Model", models)
 
-        trims = sb.get_trim(make, model)
+        trims = db.get_trim(make, model)
         trims.insert(0, previews["trim"])
         trim = col3.selectbox("Trim", trims)
 
-        years = sb.get_year(make, model, trim)
+        years = db.get_year(make, model, trim)
         years.insert(0, previews["year"])
         year = col4.selectbox("Year", years)
         app.space(1)
