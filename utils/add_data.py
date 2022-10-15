@@ -7,7 +7,7 @@ def get_meta(video):
     """
     Get meta data via YouTube API
     """
-    st.spinner("1/6) Get meta data")
+    st.spinner("1/6) Retrieving meta data")
     return video.get_meta()
 
 
@@ -15,7 +15,7 @@ def get_content(video):
     """
     Get post and comment content via YouTube API
     """
-    with st.spinner("2/6) Scrape content"):
+    with st.spinner("2/6) Retrieving content"):
         return video.get_content_raw()
 
 
@@ -24,23 +24,24 @@ def get_sentiment(video, content):
     Get sentiment data calculated from content 
     via custom Transformers model
     """
-    with st.spinner("3/6) Calculate sentiment"):
+    with st.spinner("3/6) Calculating sentiment"):
         return video.get_sentiment_transformers(content)
 
 
-def post_meta(video, meta):
+def post_meta(video, meta, comment_count_actual):
     """
     Post meta to Supabase
     """
-    with st.spinner("4/6) Push meta data to database"):
-        video.post_meta_supabase(video.get_car_id(), meta)
+    with st.spinner("4/6) Pushing meta data to database"):
+        video.post_meta_supabase(
+            video.get_car_id(), meta, comment_count_actual)
 
 
 def post_content(video, content):
     """
     Post content to Supabase
     """
-    with st.spinner("5/6) Push content to database"):
+    with st.spinner("5/6) Pushing content to database"):
         video.post_content_supabase(video.get_car_id(), content)
 
 
@@ -48,7 +49,7 @@ def post_sentiment(video, sentiment):
     """
     Post sentiment to Supabase
     """
-    with st.spinner("6/6) Push sentiment to database"):
+    with st.spinner("6/6) Pushing sentiment to database"):
         video.post_sentiment_supabase(video.get_car_id(), sentiment)
 
 

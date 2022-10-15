@@ -89,11 +89,11 @@ class Video:
         """
         return db.get_car_id(self._make, self._model, self._trim, self._year)
 
-    def post_meta_supabase(self, car_id, meta):
+    def post_meta_supabase(self, car_id, meta, comment_count_actual):
         """
         Post meta data to Supabase.
         """
-        return db.insert_meta(self._video_id, car_id, meta)
+        return db.insert_meta(self._video_id, car_id, meta, comment_count_actual)
 
     def post_content_supabase(self, car_id, content):
         """

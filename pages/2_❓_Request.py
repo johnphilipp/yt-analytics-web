@@ -36,7 +36,7 @@ def request():
                     content = get_content(video)
                     sentiment = get_sentiment(video, content)
 
-                    post_meta(video, meta)
+                    post_meta(video, meta, len(content))
                     post_content(video, content)
                     post_sentiment(video, sentiment)
 

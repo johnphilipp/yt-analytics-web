@@ -78,7 +78,7 @@ def get_num_comments(video_id):
     return supabase.table("CONTENT").select("video_id", count="exact").eq("video_id", video_id).execute().count
 
 
-def insert_meta(video_id, car_id, meta):
+def insert_meta(video_id, car_id, meta, comment_count_actual):
     supabase = init()
     supabase.table("META").insert({
         "video_id": video_id,
@@ -88,6 +88,7 @@ def insert_meta(video_id, car_id, meta):
         "view_count": meta["view_count"],
         "like_count": meta["like_count"],
         "comment_count": meta["comment_count"],
+        "comment_count_actual": comment_count_actual,
         "thumbnail_url": meta["thumbnail_url"],
         "published_at": meta["published_at"]
     }).execute()
