@@ -1,5 +1,4 @@
 colour==0.1.5
-en_core_web_sm==3.4.0
 google_api_python_client==2.64.0
 matplotlib==3.5.2
 nltk==3.7
@@ -16,3 +15,4 @@ toml==0.10.2
 torch==1.11.0
 transformers==4.20.0
 wordcloud==1.8.1
+
