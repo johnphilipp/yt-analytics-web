@@ -225,58 +225,82 @@ def get_feature_stats_for_cars(cars):
     ]
 
     supabase = init()
-    df = pd.DataFrame(
-        columns=["make", "model", "car_id", "content", "sentiment_score"])
 
-    df_features = pd.DataFrame(
-        columns=["make", "model", "car_id", "content", "sentiment_score", "feature"])
-
-    df_feature_stats = pd.DataFrame(
+    df_feature_stats_all = pd.DataFrame(
         columns=["make", "model", "feature", "comment_count", "sentiment_mean"])
 
     if isinstance(cars, int):
-        make = get_make_from_car_id(cars)
-        model = get_model_from_car_id(cars)
-        data = supabase.table("SENTIMENT").select(
-            "car_id", "content", "sentiment_score").eq("car_id", cars).execute()
-        data = pd.DataFrame(data.data)
-        df = pd.concat([df, data]).sort_values(by=["car_id"])
-        df['make'] = df['make'].fillna(make)
-        df['model'] = df['model'].fillna(model)
+        df_sentiment = pd.DataFrame(
+            columns=["make", "model", "car_id", "content", "sentiment_score"])
+        df_features = pd.DataFrame(
+            columns=["make", "model", "car_id", "content", "sentiment_score", "feature"])
+        df_feature_stats = pd.DataFrame(
+            columns=["make", "model", "feature", "comment_count", "sentiment_mean"])
+
+        car_id = cars
+        make = get_make_from_car_id(car_id)
+        model = get_model_from_car_id(car_id)
+
+        sentiment = supabase.table("SENTIMENT").select(
+            "car_id", "content", "sentiment_score").eq("car_id", car_id).execute()
+        sentiment = pd.DataFrame(sentiment.data)
+
+        df_sentiment = pd.concat(
+            [df_sentiment, sentiment]).sort_values(by=["car_id"])
+        df_sentiment['make'] = df_sentiment['make'].fillna(make)
+        df_sentiment['model'] = df_sentiment['model'].fillna(model)
 
         df_features = pd.concat([df_features, _get_features(
-            df, feature_list)]).sort_values(by=["car_id"])
+            df_sentiment, feature_list)])
 
         df_feature_stats = pd.concat([df_feature_stats, _get_feature_stats(
-            make, model, df_features, feature_list)]).sort_values(by=["make", "model"])
+            make, model, df_features, feature_list)])
+        df_feature_stats_all = pd.concat(
+            [df_feature_stats_all, df_feature_stats])
 
-        df_feature_stats['car'] = df_feature_stats[["make", "model"]].apply(
+        df_feature_stats_all['car'] = df_feature_stats_all[["make", "model"]].apply(
             lambda row: ' '.join(row.values.astype(str)), axis=1)
-        df.drop(columns=['make', 'model'], inplace=True)
-        df_feature_stats = df_feature_stats.sort_values(by=["feature"])
+        df_feature_stats_all = df_feature_stats_all.drop(
+            columns=['make', 'model'])
+        df_feature_stats_all = df_feature_stats_all.sort_values(
+            by=["feature", "car"])
+
     else:
         for make in cars.keys():
             for model in cars[make].keys():
+                df_sentiment = pd.DataFrame(
+                    columns=["make", "model", "car_id", "content", "sentiment_score"])
+                df_features = pd.DataFrame(
+                    columns=["make", "model", "car_id", "content", "sentiment_score", "feature"])
+                df_feature_stats = pd.DataFrame(
+                    columns=["make", "model", "feature", "comment_count", "sentiment_mean"])
+
                 for car_id in cars[make][model].keys():
-                    data = supabase.table("SENTIMENT").select(
+                    sentiment = supabase.table("SENTIMENT").select(
                         "car_id", "content", "sentiment_score").eq("car_id", car_id).execute()
-                    data = pd.DataFrame(data.data)
-                    df = pd.concat([df, data]).sort_values(by=["car_id"])
-                df['make'] = df['make'].fillna(make)
-                df['model'] = df['model'].fillna(model)
+                    sentiment = pd.DataFrame(sentiment.data)
+
+                    df_sentiment = pd.concat(
+                        [df_sentiment, sentiment]).sort_values(by=["car_id"])
+                    df_sentiment['make'] = df_sentiment['make'].fillna(make)
+                    df_sentiment['model'] = df_sentiment['model'].fillna(model)
 
                 df_features = pd.concat([df_features, _get_features(
-                    df, feature_list)]).sort_values(by=["car_id"])
+                    df_sentiment, feature_list)])
 
                 df_feature_stats = pd.concat([df_feature_stats, _get_feature_stats(
-                    make, model, df_features, feature_list)]).sort_values(by=["make", "model"])
+                    make, model, df_features, feature_list)])
+                df_feature_stats_all = pd.concat(
+                    [df_feature_stats_all, df_feature_stats])
 
-        df_feature_stats['car'] = df_feature_stats[["make", "model"]].apply(
+        df_feature_stats_all['car'] = df_feature_stats_all[["make", "model"]].apply(
             lambda row: ' '.join(row.values.astype(str)), axis=1)
-        df.drop(columns=['make', 'model'], inplace=True)
-        df_feature_stats = df_feature_stats.sort_values(by=["feature"])
+        df_feature_stats_all = df_feature_stats_all.drop(
+            columns=['make', 'model'])
+        df_feature_stats_all = df_feature_stats_all.sort_values(
+            by=["feature", "car"])
 
-    return df_feature_stats
+    return df_feature_stats_all
 
 
 def get_makes():

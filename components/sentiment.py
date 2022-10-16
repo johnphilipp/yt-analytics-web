@@ -1,6 +1,4 @@
 from database import db
-from utils import app
-import streamlit as st
 import pandas as pd
 import plotly.express as px
 
@@ -16,12 +14,9 @@ def get_radar_chart(df):
                         color='car',
                         line_close=True,
                         line_shape='linear',  # or spline
-                        hover_name='make',
-                        hover_data={'make': False},
+                        hover_name='car',
+                        hover_data={'car': False},
                         markers=True,
-                        # labels={'rating': 'stars'},
-                        # text='car',
-                        # start_angle=0,
                         range_r=[0, 5],
                         direction='clockwise')  # or counterclockwise
     fig.update_traces(fill='toself')

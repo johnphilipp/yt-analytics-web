@@ -5,9 +5,6 @@ import matplotlib.pyplot as plt
 import en_core_web_sm
 
 
-# TODO: Add caching
-
-
 def get_df_feature_adj(df_feature):
     """
     Returns df with only adjectives in content
